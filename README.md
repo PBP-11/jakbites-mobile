@@ -1,8 +1,8 @@
-# JakBites Mobile by F11 - PBP 2024/2025
+# JakBites by F11 - PBP 2024/2025
 
 ### 🍽️ Discover the best restaurants and food in Jakarta! 🌆
 
-### [🚀 Deployment Link](http://william-matthew31-jakbites.pbp.cs.ui.ac.id/)
+### [🚀 App Deployment Link (TBA)](link_here)
 
 ## Our Team 👥
 
@@ -28,10 +28,10 @@ Dengan JakBites, menemukan tempat makan yang sempurna di Jakarta menjadi lebih p
 
 ## Modules 📦
 
-1. **Authentication and Admin (Autentikasi dan Admin): Fadhlan**
+1. **Authentication and Admin/Super User (Autentikasi dan Admin/Super User): Fadhlan**
    - **🔐 Login Page:** Halaman untuk masuk ke akun pengguna.
    - **📝 Register Page:** Halaman pendaftaran untuk pengguna baru.
-   - **🛠️ Admin Page:** Halaman yang memungkinkan admin untuk mengelola website.
+   - **🛠️ Admin Pages:** Halaman yang memungkinkan admin untuk menambah Restoran dan Makanan
    - **🍔 Add Food and Resto:** Admin dapat menambah data makanan dan restoran baru.
 
 2. **Main: Christian**
@@ -60,5 +60,35 @@ Dengan JakBites, menemukan tempat makan yang sempurna di Jakarta menjadi lebih p
 1. **Pengguna Biasa (User):** 
    Pengguna umum yang menggunakan JakBites untuk menemukan restoran dan makanan di Jakarta. Mereka dapat mencari restoran dan produk makanan, menambah tempat favorit, serta memberikan ulasan dan rating terhadap restoran atau produk makanan.
 
-2. **Administrator (Admin):** 
-   Admin memiliki hak penuh untuk mengelola konten di JakBites. Mereka dapat menambahkan restoran dan makanan baru, serta memantau aktivitas pengguna di platform.
+2. **Administrator (Admin / Super User):** 
+   Admin memiliki hak penuh untuk mengelola konten di JakBites. Mereka dapat menambahkan restoran dan makanan baru.
+
+## Integration With JakBites Web App ⚙️
+
+Untuk mengintegrasikan aplikasi mobile JakBites dengan web service yang telah dibangun pada Proyek Tengah Semester, kami mengikuti beberapa langkah utama:
+
+1. **Membuat Model di Flutter**:
+   - Mendefinisikan kelas model yang sesuai dengan respons dari web service Django menggunakan metode `fromJson` dan `toJson`.
+   - Mengimpor library `dart:convert` untuk membantu dalam proses konversi data JSON.
+
+2. **Mengambil Data dari Web Service**:
+   - Menggunakan package `http` untuk melakukan request ke web service.
+   - Melakukan parsing data JSON yang diterima menjadi objek model di Flutter.
+
+3. **State Management dengan Provider**:
+   - Mengimplementasikan `Provider` untuk mengelola state secara global.
+   - Memungkinkan akses ke instance `CookieRequest` di seluruh widget dalam aplikasi.
+
+4. **Autentikasi**:
+   - Mengintegrasikan fitur login dan registrasi dengan endpoint autentikasi pada web service Django.
+   - Menggunakan package `pbp_django_auth` untuk mempermudah proses autentikasi dan pengelolaan cookie.
+
+5. **Testing dan Debugging**:
+   - Menguji koneksi antara aplikasi Flutter dan web service untuk memastikan data dapat diambil dan dikirim dengan benar.
+   - Melakukan debugging terhadap isu yang muncul selama proses integrasi.
+
+6. **Deploy Aplikasi**:
+   - Melakukan deploy aplikasi Flutter dan memastikan bahwa aplikasi terhubung dengan web service yang telah di-deploy sebelumnya.
+   - Memastikan fungsi-fungsi utama berjalan dengan baik setelah proses deploy.
+
+Dengan mengikuti langkah-langkah di atas, aplikasi mobile JakBites berhasil terhubung dengan web service, memungkinkan sinkronisasi data antara aplikasi web dan mobile serta memberikan pengalaman pengguna yang konsisten.
