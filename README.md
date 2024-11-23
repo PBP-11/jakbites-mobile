@@ -1,4 +1,4 @@
-# JakBites by F11 - PBP 2024/2025
+# JakBites Mobile by F11 - PBP 2024/2025
 
 ### 🍽️ Discover the best restaurants and food in Jakarta! 🌆
 
