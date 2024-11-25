@@ -1,4 +1,4 @@
-# JakBites Mobile by F11 - PBP 2024/2025
+# JakBites by F11 - PBP 2024/2025
 
 ### 🍽️ Discover the best restaurants and food in Jakarta! 🌆
 
@@ -92,3 +92,6 @@ Untuk mengintegrasikan aplikasi mobile JakBites dengan web service yang telah di
    - Memastikan fungsi-fungsi utama berjalan dengan baik setelah proses deploy.
 
 Dengan mengikuti langkah-langkah di atas, aplikasi mobile JakBites berhasil terhubung dengan web service, memungkinkan sinkronisasi data antara aplikasi web dan mobile serta memberikan pengalaman pengguna yang konsisten.
+ 
+## Progress Tracker 🧑‍💻
+https://docs.google.com/spreadsheets/d/1knfOWS6yBqFtnk24bmdTAVb6XyoES_G3vpkKikH71y8/edit?usp=sharing
