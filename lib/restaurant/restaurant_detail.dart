@@ -18,7 +18,7 @@ class RestaurantPageDetail extends StatefulWidget {
 class _RestaurantPageDetailState extends State<RestaurantPageDetail> {
   double avg_rating = 0.0;
   Future<List<ReviewRestaurant>> fetchReviewRestaurant(CookieRequest request) async {
-    final response = await request.get('http://127.0.0.1:8000/json_review_restaurant/');
+    final response = await request.get('https://william-matthew31-jakbites.pbp.cs.ui.ac.id/json_review_restaurant/');
     
     // Melakukan decode response menjadi bentuk json
     var data = response;
