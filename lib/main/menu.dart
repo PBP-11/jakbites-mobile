@@ -21,7 +21,7 @@ class MyHomePage extends StatelessWidget {
               Text(
                 'Enaknya makan apa ya?',
                 style: TextStyle(
-                  fontSize: 39,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
                 ),
