@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:jakbites_mobile/authentication/login.dart';
 import 'package:jakbites_mobile/main/menu.dart';
-// import 'package:jakbites_mobile/productentry_form.dart';
+import 'package:jakbites_mobile/restaurant/restaurant_list.dart';
 // import 'package:jakbites_mobile/list_ProductEntry.dart';
 // import 'package:jakbites_mobile/food_resto.dart'; // Import Food Resto screen
 // import 'package:jakbites_mobile/auth/login.dart'; // Import Login screen
@@ -62,7 +63,7 @@ class LeftDrawer extends StatelessWidget {
                 _buildDrawerItem(
                   context,
                   icon: Icons.home_outlined,
-                  title: 'Halaman Utama',
+                  title: 'Main Page',
                   onTap: () {
                     Navigator.pushReplacement(
                       context,
@@ -83,19 +84,19 @@ class LeftDrawer extends StatelessWidget {
                 ),
                 _buildDrawerItem(
                   context,
-                  icon: Icons.list_alt_rounded,
-                  title: 'Daftar Product',
+                  icon: Icons.place,
+                  title: 'Restaurants',
                   onTap: () {
-                  //   Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(builder: (context) => const ProductEntryPage()),
-                  //   );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const RestaurantPage()),
+                  );
                   },
                 ),
                 _buildDrawerItem(
                   context,
                   icon: Icons.restaurant,
-                  title: 'Food Resto',
+                  title: 'Foods',
                   onTap: () {
                   //   Navigator.push(
                   //     context,
@@ -113,10 +114,10 @@ class LeftDrawer extends StatelessWidget {
             icon: Icons.logout,
             title: 'Logout/Login',
             onTap: () {
-            //   Navigator.pushReplacement(
-            //     context,
-            //     MaterialPageRoute(builder: (context) => const LoginPage()),
-            //   );
+              Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const LoginPage()),
+              );
             },
           ),
           const SizedBox(height: 10),
