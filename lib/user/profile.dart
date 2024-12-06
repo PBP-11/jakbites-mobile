@@ -2,13 +2,16 @@
 
 import 'package:flutter/material.dart';
 import 'package:jakbites_mobile/models/profile_model.dart';
- // Ensure this import is active
+// import 'package:jakbites_mobile/models/restaurant_model.dart'; // Ensure this import is active
+// import 'package:jakbites_mobile/models/food_model.dart'; // Ensure this import is active
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'dart:convert';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'dart:io';
+
+const String baseUrl = 'http://localhost:8000'; // Adjust based on your environment
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -40,7 +43,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     // Send the request to fetch profile data from the Django server
-    final response = await request.get('http://localhost:8000/user/get_client_data/');
+    final response = await request.get('$baseUrl/user/get_client_data/');
 
     if (response['success']) {
       return Profile.fromJson(response['data']);
@@ -78,7 +81,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
       final request = context.read<CookieRequest>();
       final response = await request.postJson(
-        "http://localhost:8000/user/upload-picture-flutter/",
+        "$baseUrl/user/upload-picture-flutter/",
         jsonEncode({'profile_picture': base64ImageString}),
       );
 
@@ -108,7 +111,7 @@ class _ProfilePageState extends State<ProfilePage> {
   // Function to fetch all restaurants as Restaurant objects
   Future<List<Restaurant>> fetchAllRestaurantsObjects() async {
     final request = context.read<CookieRequest>();
-    final response = await request.get('http://localhost:8000/user/get-all-restaurants-flutter/');
+    final response = await request.get('$baseUrl/user/get-all-restaurants-flutter/');
 
     if (response['status'] == 'success') {
       List<dynamic> data = response['data'];
@@ -121,7 +124,7 @@ class _ProfilePageState extends State<ProfilePage> {
   // Function to fetch all foods as Food objects
   Future<List<Food>> fetchAllFoodsObjects() async {
     final request = context.read<CookieRequest>();
-    final response = await request.get('http://localhost:8000/user/get-all-foods-flutter/');
+    final response = await request.get('$baseUrl/user/get-all-foods-flutter/');
 
     if (response['status'] == 'success') {
       List<dynamic> data = response['data'];
@@ -159,6 +162,17 @@ class _ProfilePageState extends State<ProfilePage> {
             _isInitialized = true;
           }
 
+          // Construct the full URL for the profile picture
+          String? profilePictureUrl;
+          if (profile.profilePicture != null && profile.profilePicture!.isNotEmpty) {
+            // Check if the profilePicture already contains the base URL
+            if (profile.profilePicture!.startsWith('http')) {
+              profilePictureUrl = profile.profilePicture!;
+            } else {
+              profilePictureUrl = '$baseUrl${profile.profilePicture}';
+            }
+          }
+
           return Padding(
             padding: const EdgeInsets.all(16.0),
             child: SingleChildScrollView( // Prevent overflow on smaller screens
@@ -171,8 +185,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       children: [
                         CircleAvatar(
                           radius: 60,
-                          backgroundImage: profile.profilePicture != null
-                              ? NetworkImage(profile.profilePicture!)
+                          backgroundImage: profilePictureUrl != null
+                              ? NetworkImage(profilePictureUrl)
                               : const AssetImage('assets/default_profile.png') as ImageProvider,
                         ),
                         Positioned(
@@ -312,7 +326,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 final request = context.read<CookieRequest>();
                 try {
                   final response = await request.postJson(
-                    "http://localhost:8000/user/change-username-flutter/",
+                    "$baseUrl/user/change-username-flutter/",
                     jsonEncode({'new_value': newUsername}),
                   );
 
@@ -381,7 +395,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 final request = context.read<CookieRequest>();
                 try {
                   final response = await request.postJson(
-                    "http://localhost:8000/user/change-description-flutter/",
+                    "$baseUrl/user/change-description-flutter/",
                     jsonEncode({'new_value': newDescription}),
                   );
 
@@ -524,7 +538,9 @@ class _ProfilePageState extends State<ProfilePage> {
                       searchable: true,
                       listType: MultiSelectListType.LIST,
                       onConfirm: (results) {
-                        tempSelectedRestaurants = results;
+                        setState(() {
+                          tempSelectedRestaurants = results;
+                        });
                       },
                       decoration: BoxDecoration(
                         borderRadius: const BorderRadius.all(Radius.circular(4)),
@@ -572,7 +588,7 @@ class _ProfilePageState extends State<ProfilePage> {
       final request = context.read<CookieRequest>();
       try {
         final response = await request.postJson(
-          "http://localhost:8000/user/update-fav-restaurants-flutter/",
+          "$baseUrl/user/update-fav-restaurants-flutter/",
           jsonEncode({'favorite_restaurants': selectedIds}),
         );
 
@@ -648,7 +664,9 @@ class _ProfilePageState extends State<ProfilePage> {
                       searchable: true,
                       listType: MultiSelectListType.LIST,
                       onConfirm: (results) {
-                        tempSelectedFoods = results;
+                        setState(() {
+                          tempSelectedFoods = results;
+                        });
                       },
                       decoration: BoxDecoration(
                         borderRadius: const BorderRadius.all(Radius.circular(4)),
@@ -696,7 +714,7 @@ class _ProfilePageState extends State<ProfilePage> {
       final request = context.read<CookieRequest>();
       try {
         final response = await request.postJson(
-          "http://localhost:8000/user/update-fav-foods-flutter/",
+          "$baseUrl/user/update-fav-foods-flutter/",
           jsonEncode({'favorite_foods': selectedIds}),
         );
 
