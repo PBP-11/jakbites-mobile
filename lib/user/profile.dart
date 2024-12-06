@@ -317,14 +317,18 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           actions: [
             TextButton(
-              child: const Text('Cancel'),
+              child: const Text('Cancel', style: TextStyle(color: Colors.white),),
+              style: TextButton.styleFrom(backgroundColor: Colors.red,),
+
               onPressed: () {
                 Navigator.of(context).pop();
                 _nameController.text = ''; // Reset the controller
               },
             ),
             ElevatedButton(
-              child: const Text('Save'),
+              child: const Text('Save', style: TextStyle(color: Colors.white),),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue,),
+
               onPressed: () async {
                 String newUsername = _nameController.text.trim();
                 if (newUsername.isEmpty) {
@@ -386,14 +390,17 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           actions: [
             TextButton(
-              child: const Text('Cancel'),
+              child: const Text('Cancel',style: TextStyle(color: Colors.white), ),
+              style: TextButton.styleFrom(backgroundColor: Colors.red,),
               onPressed: () {
                 Navigator.of(context).pop();
                 _descriptionController.text = ''; // Reset the controller
               },
             ),
             ElevatedButton(
-              child: const Text('Save'),
+              child: const Text('Save', style: TextStyle(color: Colors.white),),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue,),
+
               onPressed: () async {
                 String newDescription = _descriptionController.text.trim();
                 if (newDescription.isEmpty) {
@@ -451,7 +458,9 @@ class _ProfilePageState extends State<ProfilePage> {
           content: _alertDialogContent(),
           actions: [
             TextButton(
-              child: const Text('Cancel'),
+              child: const Text('Cancel', style: TextStyle(color: Colors.white),),
+              style: TextButton.styleFrom(backgroundColor: Colors.red,),
+
               onPressed: () {
                 Navigator.of(context).pop();
                 setState(() {
@@ -461,7 +470,9 @@ class _ProfilePageState extends State<ProfilePage> {
               },
             ),
             ElevatedButton(
-              child: const Text('Upload'),
+              child: const Text('Upload', style: TextStyle(color: Colors.white),),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue,),
+
               onPressed: () async {
                 if ((kIsWeb && _pickedImageBytes == null) || (!kIsWeb && _pickedImage == null)) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -588,19 +599,29 @@ class _ProfilePageState extends State<ProfilePage> {
                           });
                         },
                       ),
+                      cancelText: Text(
+                        "Cancel",
+                        style: TextStyle(color: Colors.red),
+                      ),
+                      confirmText: Text(
+                        "Save",
+                        style: TextStyle(color: Colors.blue),
+                      ),
                     ),
                   );
                 },
               ),
               actions: [
                 TextButton(
-                  child: const Text('Cancel'),
+                  child: const Text('Cancel', style: TextStyle(color: Colors.white),),
+                  style: TextButton.styleFrom(backgroundColor: Colors.red,),
                   onPressed: () {
                     Navigator.of(context).pop(); // Close the dialog without returning data
                   },
                 ),
                 ElevatedButton(
-                  child: const Text('Save'),
+                  child: const Text('Save', style: TextStyle(color: Colors.white),),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blue,),
                   onPressed: () {
                     Navigator.of(context).pop(tempSelectedRestaurants); // Return the updated list
                   },
@@ -714,19 +735,30 @@ class _ProfilePageState extends State<ProfilePage> {
                           });
                         },
                       ),
+                      cancelText: Text(
+                        "Cancel",
+                        style: TextStyle(color: Colors.red),
+                      ),
+                      confirmText: Text(
+                        "Save",
+                        style: TextStyle(color: Colors.blue),
+                      ),
                     ),
                   );
                 },
               ),
               actions: [
                 TextButton(
-                  child: const Text('Cancel'),
+                  child: const Text('Cancel',style: TextStyle(color: Colors.white),),
+                  style: TextButton.styleFrom(backgroundColor: Colors.red,),
                   onPressed: () {
                     Navigator.of(context).pop(); // Close the dialog without returning data
                   },
                 ),
                 ElevatedButton(
-                  child: const Text('Save'),
+                  child: const Text('Save', style: TextStyle(color: Colors.white),),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blue,),
+
                   onPressed: () {
                     Navigator.of(context).pop(tempSelectedFoods); // Return the updated list
                   },
