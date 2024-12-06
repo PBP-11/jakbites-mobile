@@ -1,6 +1,7 @@
 // lib/pages/profile.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:jakbites_mobile/models/profile_model.dart';
 // import 'package:jakbites_mobile/models/restaurant_model.dart'; // Ensure this import is active
 // import 'package:jakbites_mobile/models/food_model.dart'; // Ensure this import is active
@@ -10,6 +11,8 @@ import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'dart:io';
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 
 const String baseUrl = 'http://localhost:8000'; // Adjust based on your environment
 
@@ -25,7 +28,8 @@ class _ProfilePageState extends State<ProfilePage> {
   TextEditingController _nameController = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
   bool _isInitialized = false; // To ensure controllers are set only once
-  File? _selectedImage; // For profile picture
+  File? _pickedImage; // For mobile
+  Uint8List? _pickedImageBytes; // For web
 
   @override
   void initState() {
@@ -53,20 +57,25 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   // Function to pick an image from the gallery
+  XFile? _pickedFile; // Use XFile instead of File
+
   Future<void> _pickImage() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
-      setState(() {
-        _selectedImage = File(pickedFile.path);
-      });
+      if (kIsWeb) {
+        _pickedImageBytes = await pickedFile.readAsBytes();
+      } else {
+        _pickedImage = File(pickedFile.path);
+      }
+      setState(() {});
     }
   }
 
   // Function to upload the selected profile picture
   Future<void> _uploadProfilePicture() async {
-    if (_selectedImage == null) {
+    if ((kIsWeb && _pickedImageBytes == null) || (!kIsWeb && _pickedImage == null)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('No image selected.')),
       );
@@ -74,10 +83,14 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     try {
-      // Convert image to base64
-      List<int> imageBytes = await _selectedImage!.readAsBytes();
-      String base64Image = base64Encode(imageBytes);
-      String base64ImageString = 'data:image/png;base64,$base64Image'; // Adjust MIME type if necessary
+      String base64ImageString;
+      if (kIsWeb) {
+        base64ImageString = 'data:image/png;base64,${base64Encode(_pickedImageBytes!)}';
+      } else {
+        List<int> imageBytes = await _pickedImage!.readAsBytes();
+        String base64Image = base64Encode(imageBytes);
+        base64ImageString = 'data:image/png;base64,$base64Image';
+      }
 
       final request = context.read<CookieRequest>();
       final response = await request.postJson(
@@ -90,7 +103,8 @@ class _ProfilePageState extends State<ProfilePage> {
       if (response['status'] == 'success') {
         setState(() {
           profileData = fetchProfile(); // Refresh profile data
-          _selectedImage = null; // Reset the selected image
+          _pickedImage = null;
+          _pickedImageBytes = null; // Reset the selected image bytes for web
         });
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Profile picture updated successfully!')),
@@ -434,43 +448,22 @@ class _ProfilePageState extends State<ProfilePage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Edit Profile Picture'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _selectedImage != null
-                  ? Image.file(
-                      _selectedImage!,
-                      height: 100,
-                      width: 100,
-                    )
-                  : const Icon(
-                      Icons.account_circle,
-                      size: 100,
-                    ),
-              const SizedBox(height: 10),
-              ElevatedButton.icon(
-                icon: const Icon(Icons.photo),
-                label: const Text('Choose Image'),
-                onPressed: () {
-                  _pickImage();
-                },
-              ),
-            ],
-          ),
+          content: _alertDialogContent(),
           actions: [
             TextButton(
               child: const Text('Cancel'),
               onPressed: () {
                 Navigator.of(context).pop();
                 setState(() {
-                  _selectedImage = null; // Reset the selected image
+                  _pickedImage = null;
+                  _pickedImageBytes = null; // Reset the selected image bytes for web
                 });
               },
             ),
             ElevatedButton(
               child: const Text('Upload'),
               onPressed: () async {
-                if (_selectedImage == null) {
+                if ((kIsWeb && _pickedImageBytes == null) || (!kIsWeb && _pickedImage == null)) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('No image selected.')),
                   );
@@ -486,6 +479,45 @@ class _ProfilePageState extends State<ProfilePage> {
           ],
         );
       },
+    );
+  }
+
+  // Helper function to build the dialog content
+  Widget _alertDialogContent() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (kIsWeb)
+          _pickedImageBytes != null
+              ? Image.memory(
+                  _pickedImageBytes!,
+                  height: 100,
+                  width: 100,
+                )
+              : const Icon(
+                  Icons.account_circle,
+                  size: 100,
+                )
+        else
+          _pickedImage != null
+              ? Image.file(
+                  _pickedImage!,
+                  height: 100,
+                  width: 100,
+                )
+              : const Icon(
+                  Icons.account_circle,
+                  size: 100,
+                ),
+        const SizedBox(height: 10),
+        ElevatedButton.icon(
+          icon: const Icon(Icons.photo),
+          label: const Text('Choose Image'),
+          onPressed: () {
+            _pickImage();
+          },
+        ),
+      ],
     );
   }
 
