@@ -27,7 +27,9 @@ class Profile {
     return Profile(
       username: json['username'],
       profilePicture: json['profile_picture'],
-      description: json['description'],
+      description: (json['description'] as String?)?.isNotEmpty == true
+        ? json['description'] as String
+        : 'Description not available',      
       favoriteRestaurants: favoriteRestaurants,
       favoriteFoods: favoriteFoods,
     );
