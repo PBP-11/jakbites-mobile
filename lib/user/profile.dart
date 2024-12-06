@@ -2,13 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:jakbites_mobile/models/profile_model.dart';
-// import 'package:jakbites_mobile/models/restaurant_model.dart'; // Import Restaurant model
-// import 'package:jakbites_mobile/models/food_model.dart'; // Import Food model
+ // Ensure this import is active
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'dart:convert';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:multi_select_flutter/multi_select_flutter.dart'; // Import multi_select_flutter
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'dart:io';
 
 class ProfilePage extends StatefulWidget {
@@ -43,14 +42,7 @@ class _ProfilePageState extends State<ProfilePage> {
     // Send the request to fetch profile data from the Django server
     final response = await request.get('http://localhost:8000/user/get_client_data/');
 
-    // Print the entire response for debugging
-    print("Fetch Profile Response: $response");
-
     if (response['success']) {
-      // Print the username from the response
-      if (response['data'] != null && response['data'].containsKey('username')) {
-        print("Logged in username: ${response['data']['username']}");
-      }
       return Profile.fromJson(response['data']);
     } else {
       throw Exception("Failed to load profile: ${response['message']}");
@@ -484,238 +476,250 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   // Dialog to edit favorite restaurants
-  // Dialog to edit favorite restaurants
-void _showEditFavoriteRestaurantsDialog(List<Restaurant> currentFavorites) {
-  // Create a temporary variable to hold the updated favorites
-  List<Restaurant> selectedRestaurants = List.from(currentFavorites);
+  Future<void> _showEditFavoriteRestaurantsDialog(List<Restaurant> currentFavorites) async {
+    // Show the dialog and wait for the result
+    List<Restaurant>? updatedFavorites = await showDialog<List<Restaurant>>(
+      context: context,
+      builder: (BuildContext context) {
+        // Temporary list to hold selections within the dialog
+        List<Restaurant> tempSelectedRestaurants = List.from(currentFavorites);
 
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('Edit Favorite Restaurants'),
-        content: FutureBuilder<List<Restaurant>>(
-          future: fetchAllRestaurantsObjects(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const SizedBox(
-                height: 100,
-                child: Center(child: CircularProgressIndicator()),
-              );
-            }
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Edit Favorite Restaurants'),
+              content: FutureBuilder<List<Restaurant>>(
+                future: fetchAllRestaurantsObjects(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const SizedBox(
+                      height: 100,
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
 
-            if (snapshot.hasError) {
-              return SizedBox(
-                height: 100,
-                child: Center(child: Text('Error: ${snapshot.error}')),
-              );
-            }
+                  if (snapshot.hasError) {
+                    return SizedBox(
+                      height: 100,
+                      child: Center(child: Text('Error: ${snapshot.error}')),
+                    );
+                  }
 
-            if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return const SizedBox(
-                height: 100,
-                child: Center(child: Text('No restaurants available.')),
-              );
-            }
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const SizedBox(
+                      height: 100,
+                      child: Center(child: Text('No restaurants available.')),
+                    );
+                  }
 
-            List<Restaurant> allRestaurants = snapshot.data!;
+                  List<Restaurant> allRestaurants = snapshot.data!;
 
-            return SingleChildScrollView(
-              child: MultiSelectDialogField<Restaurant>(
-                items: allRestaurants
-                    .map((resto) => MultiSelectItem<Restaurant>(resto, resto.name))
-                    .toList(),
-                initialValue: selectedRestaurants,
-                title: const Text('Restaurants'),
-                searchable: true,
-                listType: MultiSelectListType.LIST,
-                onConfirm: (results) {
-                  // Update the local variable with the new selections
-                  selectedRestaurants = results;
+                  return SingleChildScrollView(
+                    child: MultiSelectDialogField<Restaurant>(
+                      items: allRestaurants
+                          .map((resto) => MultiSelectItem<Restaurant>(resto, resto.name))
+                          .toList(),
+                      initialValue: tempSelectedRestaurants,
+                      title: const Text('Restaurants'),
+                      searchable: true,
+                      listType: MultiSelectListType.LIST,
+                      onConfirm: (results) {
+                        tempSelectedRestaurants = results;
+                      },
+                      decoration: BoxDecoration(
+                        borderRadius: const BorderRadius.all(Radius.circular(4)),
+                        border: Border.all(
+                          color: Colors.grey,
+                          width: 1,
+                        ),
+                      ),
+                      chipDisplay: MultiSelectChipDisplay(
+                        onTap: (item) {
+                          setState(() {
+                            tempSelectedRestaurants.remove(item);
+                          });
+                        },
+                      ),
+                    ),
+                  );
                 },
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(4)),
-                  border: Border.all(
-                    color: Colors.grey,
-                    width: 1,
-                  ),
-                ),
-                chipDisplay: MultiSelectChipDisplay(
-                  onTap: (item) {
-                    setState(() {
-                      selectedRestaurants.remove(item);
-                    });
+              ),
+              actions: [
+                TextButton(
+                  child: const Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close the dialog without returning data
                   },
                 ),
-              ),
+                ElevatedButton(
+                  child: const Text('Save'),
+                  onPressed: () {
+                    Navigator.of(context).pop(tempSelectedRestaurants); // Return the updated list
+                  },
+                ),
+              ],
             );
           },
-        ),
-        actions: [
-          TextButton(
-            child: const Text('Cancel'),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-          ElevatedButton(
-            child: const Text('Save'),
-            onPressed: () async {
-              Navigator.of(context).pop(); // Close the dialog
+        );
+      },
+    );
 
-              // Use the updated 'selectedRestaurants' variable here
-              List<int> selectedIds = selectedRestaurants.map<int>((resto) => resto.id).toList();
+    // If the user saved the changes, proceed to update
+    if (updatedFavorites != null) {
+      List<int> selectedIds = updatedFavorites.map<int>((resto) => resto.id).toList();
+      print("Selected Restaurant IDs to send: $selectedIds");
 
-              final request = context.read<CookieRequest>();
-              try {
-                final response = await request.postJson(
-                  "http://localhost:8000/user/update-fav-restaurants-flutter/",
-                  jsonEncode({'favorite_restaurants': selectedIds}),
-                );
+      final request = context.read<CookieRequest>();
+      try {
+        final response = await request.postJson(
+          "http://localhost:8000/user/update-fav-restaurants-flutter/",
+          jsonEncode({'favorite_restaurants': selectedIds}),
+        );
 
-                print("Update Favorite Restaurants Response: $response");
+        print("Update Favorite Restaurants Response: $response");
 
-                if (response['status'] == 'success') {
-                  setState(() {
-                    profileData = fetchProfile(); // Refresh profile data to reflect changes
-                  });
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Favorite restaurants updated successfully!')),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Error updating favorites: ${response['message']}')),
-                  );
-                }
-              } catch (e) {
-                print("Error in updating favorite restaurants: $e");
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Error updating favorites: $e')),
-                );
-              }
-            },
-          ),
-        ],
-      );
-    },
-  );
-}
+        if (response['status'] == 'success') {
+          setState(() {
+            profileData = fetchProfile(); // Refresh profile data to reflect changes
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Favorite restaurants updated successfully!')),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error updating favorites: ${response['message']}')),
+          );
+        }
+      } catch (e) {
+        print("Error in updating favorite restaurants: $e");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error updating favorites: $e')),
+        );
+      }
+    }
+  }
 
   // Dialog to edit favorite foods
- // Dialog to edit favorite foods
-void _showEditFavoriteFoodsDialog(List<Food> currentFavorites) {
-  // Make a local copy of the current favorites
-  List<Food> selectedFoods = List.from(currentFavorites);
+  Future<void> _showEditFavoriteFoodsDialog(List<Food> currentFavorites) async {
+    // Show the dialog and wait for the result
+    List<Food>? updatedFoods = await showDialog<List<Food>>(
+      context: context,
+      builder: (BuildContext context) {
+        // Temporary list to hold selections within the dialog
+        List<Food> tempSelectedFoods = List.from(currentFavorites);
 
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('Edit Favorite Foods'),
-        content: FutureBuilder<List<Food>>(
-          future: fetchAllFoodsObjects(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const SizedBox(
-                height: 100,
-                child: Center(child: CircularProgressIndicator()),
-              );
-            }
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Edit Favorite Foods'),
+              content: FutureBuilder<List<Food>>(
+                future: fetchAllFoodsObjects(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const SizedBox(
+                      height: 100,
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
 
-            if (snapshot.hasError) {
-              return SizedBox(
-                height: 100,
-                child: Center(child: Text('Error: ${snapshot.error}')),
-              );
-            }
+                  if (snapshot.hasError) {
+                    return SizedBox(
+                      height: 100,
+                      child: Center(child: Text('Error: ${snapshot.error}')),
+                    );
+                  }
 
-            if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return const SizedBox(
-                height: 100,
-                child: Center(child: Text('No foods available.')),
-              );
-            }
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const SizedBox(
+                      height: 100,
+                      child: Center(child: Text('No foods available.')),
+                    );
+                  }
 
-            List<Food> allFoods = snapshot.data!;
+                  List<Food> allFoods = snapshot.data!;
 
-            return SingleChildScrollView(
-              child: MultiSelectDialogField<Food>(
-                items: allFoods
-                    .map((food) => MultiSelectItem<Food>(food, food.name))
-                    .toList(),
-                initialValue: selectedFoods,
-                title: const Text('Foods'),
-                searchable: true,
-                listType: MultiSelectListType.LIST,
-                onConfirm: (results) {
-                  selectedFoods = results;
+                  return SingleChildScrollView(
+                    child: MultiSelectDialogField<Food>(
+                      items: allFoods
+                          .map((food) => MultiSelectItem<Food>(food, food.name))
+                          .toList(),
+                      initialValue: tempSelectedFoods,
+                      title: const Text('Foods'),
+                      searchable: true,
+                      listType: MultiSelectListType.LIST,
+                      onConfirm: (results) {
+                        tempSelectedFoods = results;
+                      },
+                      decoration: BoxDecoration(
+                        borderRadius: const BorderRadius.all(Radius.circular(4)),
+                        border: Border.all(
+                          color: Colors.grey,
+                          width: 1,
+                        ),
+                      ),
+                      chipDisplay: MultiSelectChipDisplay(
+                        onTap: (item) {
+                          setState(() {
+                            tempSelectedFoods.remove(item);
+                          });
+                        },
+                      ),
+                    ),
+                  );
                 },
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(4)),
-                  border: Border.all(
-                    color: Colors.grey,
-                    width: 1,
-                  ),
-                ),
-                chipDisplay: MultiSelectChipDisplay(
-                  onTap: (item) {
-                    selectedFoods.remove(item);
+              ),
+              actions: [
+                TextButton(
+                  child: const Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close the dialog without returning data
                   },
                 ),
-              ),
+                ElevatedButton(
+                  child: const Text('Save'),
+                  onPressed: () {
+                    Navigator.of(context).pop(tempSelectedFoods); // Return the updated list
+                  },
+                ),
+              ],
             );
           },
-        ),
-        actions: [
-          TextButton(
-            child: const Text('Cancel'),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-          ElevatedButton(
-            child: const Text('Save'),
-            onPressed: () async {
-              Navigator.of(context).pop(); // Close the dialog
+        );
+      },
+    );
 
-              // Extract the IDs of selected foods
-              List<int> selectedIds = selectedFoods.map<int>((food) => food.id).toList();
+    // If the user saved the changes, proceed to update
+    if (updatedFoods != null) {
+      List<int> selectedIds = updatedFoods.map<int>((food) => food.id).toList();
+      print("Selected Food IDs to send: $selectedIds");
 
-              // Proceed to send the update request
-              final request = context.read<CookieRequest>();
-              try {
-                final response = await request.postJson(
-                  "http://localhost:8000/user/update-fav-foods-flutter/",
-                  jsonEncode({'favorite_foods': selectedIds}),
-                );
+      final request = context.read<CookieRequest>();
+      try {
+        final response = await request.postJson(
+          "http://localhost:8000/user/update-fav-foods-flutter/",
+          jsonEncode({'favorite_foods': selectedIds}),
+        );
 
-                print("Update Favorite Foods Response: $response");
+        print("Update Favorite Foods Response: $response");
 
-                if (response['status'] == 'success') {
-                  setState(() {
-                    // Refresh profile data after successful update
-                    profileData = fetchProfile();
-                  });
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Favorite foods updated successfully!')),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Error updating favorites: ${response['message']}')),
-                  );
-                }
-              } catch (e) {
-                print("Error in updating favorite foods: $e");
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Error updating favorites: $e')),
-                );
-              }
-            },
-          ),
-        ],
-      );
-    },
-  );
-}
-
+        if (response['status'] == 'success') {
+          setState(() {
+            profileData = fetchProfile(); // Refresh profile data to reflect changes
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Favorite foods updated successfully!')),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error updating favorites: ${response['message']}')),
+          );
+        }
+      } catch (e) {
+        print("Error in updating favorite foods: $e");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error updating favorites: $e')),
+        );
+      }
+    }
+  }
 }
