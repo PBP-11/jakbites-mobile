@@ -32,7 +32,7 @@ class _AdminPageState extends State<AdminPage> {
     if (_currentIndex == 0) {
       // Fetch Restaurants
       final response = await request.get(
-          'https://william-matthew31-jakbites.pbp.cs.ui.ac.id/get_restaurants_flutter/');
+          'http://localhost:8000/get_restaurants_flutter/');
       setState(() {
         restaurants = restaurantFromJson(jsonEncode(response));
       });
@@ -94,7 +94,7 @@ class _AdminPageState extends State<AdminPage> {
     if (_currentIndex == 0) {
       // Delete Restaurant
       final response = await request.postJson(
-        'https://william-matthew31-jakbites.pbp.cs.ui.ac.id/delete_restaurant_flutter/',
+        'http://localhost:8000/delete_restaurant_flutter/',
         jsonEncode({"id": id}),
       );
       if (response['status'] == 'success') {
