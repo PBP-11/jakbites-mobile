@@ -23,7 +23,7 @@ class _FoodPageDetailState extends State<FoodPageDetail> {
 
   Future<List<Review>> fetchFoodReviews(CookieRequest request) async {
     final response = await request.get(
-      'http://127.0.0.1:8000/food/get_food_review/',
+      'https://william-matthew31-jakbites.pbp.cs.ui.ac.id/food/get_food_review/',
     );
 
     if (response == null || response.isEmpty) {
@@ -72,7 +72,7 @@ class _FoodPageDetailState extends State<FoodPageDetail> {
 
     try {
       final response = await request.postJson(
-        'http://127.0.0.1:8000/food/add_food_review_flutter/${widget.food.pk}/',
+        'https://william-matthew31-jakbites.pbp.cs.ui.ac.id/food/add_food_review_flutter/${widget.food.pk}/',
         jsonEncode(data),
       );
 
@@ -110,7 +110,7 @@ class _FoodPageDetailState extends State<FoodPageDetail> {
   void _deleteReview(Review review) async {
     final request = Provider.of<CookieRequest>(context, listen: false);
     final deleteUrl =
-        'http://127.0.0.1:8000/food/delete_food_review_flutter/${review.reviewid}/';
+        'https://william-matthew31-jakbites.pbp.cs.ui.ac.id/food/delete_food_review_flutter/${review.reviewid}/';
 
     try {
       final response = await request.post(deleteUrl, {});
