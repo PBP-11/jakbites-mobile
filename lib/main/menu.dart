@@ -17,7 +17,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<List<SearchItem>> fetchMenuItems() async {
     // Single endpoint returning all matching items
-    final url = Uri.parse('http://127.0.0.1:8000/search?query=');
+    final url = Uri.parse('http://localhost:8000/search?query=');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -354,7 +354,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
 class CustomSearch extends SearchDelegate {
   Future<List<SearchItem>> fetchSearchResults(String query) async {
-    final url = Uri.parse('http://127.0.0.1:8000/search?query=$query');
+    final url = Uri.parse('http://localhost:8000/search?query=$query');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {

@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
             color: Colors.transparent,
           ),
         ),
-        home: const MyHomePage(),
+        home: const LoginPage()
       ),
     );
   }

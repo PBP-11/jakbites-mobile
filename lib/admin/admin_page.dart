@@ -38,7 +38,7 @@ class _AdminPageState extends State<AdminPage> {
       });
     } else {
       // Fetch Foods (to be implemented)
-      // final response = await request.get('https://william-matthew31-jakbites.pbp.cs.ui.ac.id/get_foods_flutter/');
+      // final response = await request.get('http://localhost:8000/get_foods_flutter/');
       // setState(() {
       //   foods = foodFromJson(jsonEncode(response));
       // });
@@ -110,7 +110,7 @@ class _AdminPageState extends State<AdminPage> {
     } else {
       // Delete Food (to be implemented)
       // final response = await request.postJson(
-      //   'https://william-matthew31-jakbites.pbp.cs.ui.ac.id/delete_food_flutter/',
+      //   'http://localhost:8000/delete_food_flutter/',
       //   jsonEncode({"id": id}),
       // );
       // if (response['status'] == 'success') {
