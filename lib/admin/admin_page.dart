@@ -31,14 +31,14 @@ class _AdminPageState extends State<AdminPage> {
     final request = context.read<CookieRequest>();
     if (_currentIndex == 0) {
       // Fetch Restaurants
-      final response = await request.get('http://localhost:8000/json-restaurant/');
+      final response = await request.get('http://localhost:8000/json_restaurant/');
       if (!mounted) return;
       setState(() {
         restaurants = restaurantFromJson(jsonEncode(response));
       });
     } else {
       // Fetch Foods
-      final response = await request.get('http://localhost:8000/json-food/');
+      final response = await request.get('http://localhost:8000/json_food/');
       if (!mounted) return;
       setState(() {
         foods = foodFromJson(jsonEncode(response));
