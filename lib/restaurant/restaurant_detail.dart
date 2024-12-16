@@ -5,37 +5,68 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:jakbites_mobile/models/restaurant_review_model.dart';
+import 'add_review_restaurant.dart';
+import 'package:jakbites_mobile/food/models/food_model.dart';
+import 'package:jakbites_mobile/food/screens/food_detail.dart';
+import 'package:jakbites_mobile/food/screens/food_list.dart';
 
 class RestaurantPageDetail extends StatefulWidget {
   final Restaurant resto;
-  RestaurantPageDetail(this.resto);
+  RestaurantPageDetail(this.resto, {super.key});
 
   @override
   State<RestaurantPageDetail> createState() => _RestaurantPageDetailState();
 }
 
+class _RestaurantPageDetailState extends State<RestaurantPageDetail> {  
+  Future<List<Food>> fetchFood(CookieRequest request) async {
+    final response =
+        await request.get('http://127.0.0.1:8000/json_food/');
 
-class _RestaurantPageDetailState extends State<RestaurantPageDetail> {
-  double avg_rating = 0.0;
-  Future<List<ReviewRestaurant>> fetchReviewRestaurant(CookieRequest request) async {
-    final response = await request.get('https://william-matthew31-jakbites.pbp.cs.ui.ac.id/json_review_restaurant/');
-    
     // Melakukan decode response menjadi bentuk json
     var data = response;
-    
-    // Melakukan konversi data json menjadi object MoodEntry
-    List<ReviewRestaurant> listReviewRestaurant = [];
-    List<int> ratingRestaurant = [];
-    // print(widget.resto.pk == );
+
+    // Melakukan konversi data json menjadi object Food
+    List<Food> listFood = [];
     for (var d in data) {
       if (d != null) {
-        if (d['fields']["restaurant"] == widget.resto.pk) {
-          listReviewRestaurant.add(ReviewRestaurant.fromJson(d));
-          ratingRestaurant.add(d['fields']["rating"]);
+        if (d['restaurant'] == widget.resto.pk) {
+          listFood.add(Food.fromJson(d));
         }
       }
     }
-
+    return listFood;
+  }
+  // print(context.watch<CookieRequest>);
+  double avg_rating = 0.0;
+  Future<List<String>> fetchReviewRestaurant(CookieRequest request) async {
+    final response = await request.get('http://localhost:8000/json_review_restaurant/');
+    
+    // Melakukan decode response menjadi bentuk json
+    var data = response;
+    // print(data);
+    
+    // Melakukan konversi data json menjadi object MoodEntry
+    List<String> listReviewerName = [];
+    List<String> listReviewRestaurant = [];
+    List<int> ratingRestaurant = [];
+    // print(widget.resto.pk == );
+    for (var d in data['data']) {
+      // print(d["restaurant"]);
+      // print(widget.resto.pk);
+      if (d != null) {
+        // print(d['data']["restaurant"]);
+        if (d["restaurant"] == widget.resto.pk) {
+          // print(d);
+          // listReviewerName.add(d['user']);
+          var temp = d['user']+': '+d["rating"].toString()+'⭐   '+d['review'];
+          listReviewRestaurant.add(temp);
+          // listReviewRestaurant.add(ReviewRestaurant.fromJson(d));
+          ratingRestaurant.add(d["rating"]);
+        }
+      }
+    }
+    // print(ratingRestaurant);
     avg_rating = ratingRestaurant.reduce((a, b) => a + b) / ratingRestaurant.length;
 
     return listReviewRestaurant;
@@ -83,7 +114,8 @@ class _RestaurantPageDetailState extends State<RestaurantPageDetail> {
             }
           ),
           ),
-          Row(
+          Flexible(child: 
+            Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -118,85 +150,155 @@ class _RestaurantPageDetailState extends State<RestaurantPageDetail> {
               ),
             ],
           ),
-          Expanded(
+          ),
+          Flexible(
             child: 
-            !ismenu? Container(
-            child: 
-            FutureBuilder(
-              future: fetchReviewRestaurant(request),
-              builder: (context, AsyncSnapshot snapshot) {
-                  if (!snapshot.hasData) {
-                    return const Column(
-                      children: [
-                        Text(
-                          'Belum Menu Makanan Pada JakBites',
-                          style: TextStyle(fontSize: 20, color: Colors.black),
-                        ),
-                        SizedBox(height: 8),
-                      ],
-                    );
-                  } else {
-                    return ListView.builder(
-                      itemCount: snapshot.data!.length,
-                      itemBuilder: (_, index) => Container(
-                        padding: const EdgeInsets.all(2),
-                        child: Column(
-                          children: [
-                            Card(
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
-                              child: InkWell( 
-                                // onTap: () => Navigator.push(
-                                //   context,
-                                //   MaterialPageRoute(
-                                //     builder: (context) => RestaurantPageDetail(snapshot.data![index]),
-                                //   ),
-                                // ),
-                                child: Column(
-                                  children: <Widget>[
-                                      ListTile(
-                                        title: Text(
-                                          "${snapshot.data![index].fields.review}",
-                                            style: const TextStyle(
-                                              fontSize: 18.0,
-                                              fontWeight: FontWeight.bold,
+            !ismenu? Column(
+              children: [
+                Card(
+                // MainAxisAlignment: MainAxisAlignment.start,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => RestaurantReview(widget.resto)),
+                  );
+                  }, 
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    child: Text("Buat Review", style: TextStyle(color: Colors.black)),
+                  ),
+                  ),
+              ),
+                Flexible(child: Container(
+                  child: 
+                  FutureBuilder(
+                    future: fetchReviewRestaurant(request),
+                    builder: (context, AsyncSnapshot snapshot) {
+                        if (!snapshot.hasData) {
+                          return const Column(
+                            children: [
+                              Text(
+                                'Belum Ada Review Makanan Pada JakBites',
+                                style: TextStyle(fontSize: 20, color: Colors.black),
+                              ),
+                              SizedBox(height: 8),
+                            ],
+                          );
+                        } else {
+                          return ListView.builder(
+                            itemCount: snapshot.data!.length,
+                            itemBuilder: (_, index) => Container(
+                              padding: const EdgeInsets.all(2),
+                              child: Column(
+                                children: [
+                                  Card(
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
+                                    child: InkWell( 
+                                      child: Column(
+                                        children: <Widget>[
+                                            ListTile(
+                                              title: Text(
+                                                "${snapshot.data![index]}",
+                                                  style: const TextStyle(
+                                                    fontSize: 18.0,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                              ),
                                             ),
+                                          ],
                                         ),
-                                        // subtitle: Text(
-                                        //   "${snapshot.data![index].fields.location}",
-                                        //     style: const TextStyle(
-                                        //       fontSize: 12.0,
-                                        //       fontWeight: FontWeight.bold,
-                                        //     ),
-                                        // ),
-                                        // trailing: SvgPicture.asset(
-                                        //   'lib/assets/images/resto.svg',
-                                        //   width: 50,
-                                        //   height: 50,
-                                        //   ),
                                       ),
-                                    ],
+                                      
+                                    ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }
+                    },
+                  ),
+                ))
+              ],
+            ): 
+              FutureBuilder(
+        future: fetchFood(request),
+        builder: (context, AsyncSnapshot snapshot) {
+          if (snapshot.data == null) {
+            return const Center(child: CircularProgressIndicator());
+          } else {
+            if (!snapshot.hasData) {
+              return const Column(
+                children: [
+                  Text(
+                    'Belum ada data makanan pada JakBites',
+                    style: TextStyle(fontSize: 20, color: Color(0xff59A5D8)),
+                  ),
+                  SizedBox(height: 8),
+                ],
+              );
+            } else {
+              return ListView.builder(
+                itemCount: snapshot.data!.length,
+                itemBuilder: (_, index) => Container(
+                  padding: const EdgeInsets.all(2),
+                  child: Column(
+                    children: [
+                      Card(
+                        shape: const RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(8.0))),
+                        child: InkWell(
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  // FoodPageDetail(snapshot.data![index]),
+                                  FoodPage(),
+                            ),
+                          ),
+                          child: Column(
+                            children: <Widget>[
+                              ListTile(
+                                title: Text(
+                                  "${snapshot.data![index].fields.name}",
+                                  style: const TextStyle(
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                
+                                subtitle: Text(
+                                  "${snapshot.data![index].fields.category}",
+                                  style: const TextStyle(
+                                    fontSize: 12.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                trailing: const Icon(Icons.restaurant),
                               ),
-                            // const Image(
-                            // image: AssetImage('lib/assets/images/resto.png'),
-                            // ),
-                            // Text(
-                            //   "${snapshot.data![index].fields.name}",
-                            //   style: const TextStyle(
-                            //     fontSize: 18.0,
-                            //     fontWeight: FontWeight.bold,
-                            //   ),
-                            // ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
-                    );
-                  }
-              },
-            ),
-          ): Text("yang ngurusin food tolong urusin serealizer sama modelnya yak")
+                      // const Image(
+                      // image: AssetImage('lib/assets/images/resto.png'),
+                      // ),
+                      // Text(
+                      //   "${snapshot.data![index].fields.name}",
+                      //   style: const TextStyle(
+                      //     fontSize: 18.0,
+                      //     fontWeight: FontWeight.bold,
+                      //   ),
+                      // ),
+                    ],
+                  ),
+                ),
+              );
+            }
+          }
+        },
+      ),
           ),
         ],
       ),

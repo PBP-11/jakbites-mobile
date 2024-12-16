@@ -4,48 +4,48 @@
 
 import 'dart:convert';
 
-List<ReviewRestaurant> reviewRestaurantFromJson(String str) => List<ReviewRestaurant>.from(json.decode(str).map((x) => ReviewRestaurant.fromJson(x)));
+ReviewRestaurant reviewRestaurantFromJson(String str) => ReviewRestaurant.fromJson(json.decode(str));
 
-String reviewRestaurantToJson(List<ReviewRestaurant> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+String reviewRestaurantToJson(ReviewRestaurant data) => json.encode(data.toJson());
 
 class ReviewRestaurant {
-    String model;
-    int pk;
-    Fields fields;
+    int status;
+    String message;
+    List<Datum> data;
 
     ReviewRestaurant({
-        required this.model,
-        required this.pk,
-        required this.fields,
+        required this.status,
+        required this.message,
+        required this.data,
     });
 
     factory ReviewRestaurant.fromJson(Map<String, dynamic> json) => ReviewRestaurant(
-        model: json["model"],
-        pk: json["pk"],
-        fields: Fields.fromJson(json["fields"]),
+        status: json["status"],
+        message: json["message"],
+        data: List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
     );
 
     Map<String, dynamic> toJson() => {
-        "model": model,
-        "pk": pk,
-        "fields": fields.toJson(),
+        "status": status,
+        "message": message,
+        "data": List<dynamic>.from(data.map((x) => x.toJson())),
     };
 }
 
-class Fields {
+class Datum {
     int restaurant;
-    int user;
+    String user;
     int rating;
     String review;
 
-    Fields({
+    Datum({
         required this.restaurant,
         required this.user,
         required this.rating,
         required this.review,
     });
 
-    factory Fields.fromJson(Map<String, dynamic> json) => Fields(
+    factory Datum.fromJson(Map<String, dynamic> json) => Datum(
         restaurant: json["restaurant"],
         user: json["user"],
         rating: json["rating"],
