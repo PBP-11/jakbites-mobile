@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:jakbites_mobile/admin/admin_page.dart';
 import 'package:jakbites_mobile/authentication/login.dart';
 import 'package:jakbites_mobile/admin/restaurant_form.dart';
+import 'package:jakbites_mobile/food/screens/food_list.dart';
 import 'package:jakbites_mobile/main/menu.dart';
 import 'package:jakbites_mobile/restaurant/restaurant_list.dart';
 import 'package:jakbites_mobile/user/profile.dart';
@@ -90,10 +91,10 @@ class LeftDrawer extends StatelessWidget {
                   icon: Icons.restaurant,
                   title: 'Foods',
                   onTap: () {
-                  //   Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(builder: (context) => const FoodRestoPage()),
-                  //   );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const FoodPage()),
+                    );
                   },
                 ),
                 _buildDrawerItem(
