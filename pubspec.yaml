@@ -70,7 +70,9 @@ flutter:
     - lib/assets/
     - lib/assets/images/
     - lib/assets/images/resto.svg
-
+    - lib/assets/images/bismillah.png
+    - lib/assets/images/logo1.png
+    
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 
