@@ -1,12 +1,12 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:jakbites_mobile/models/resutarant_model.dart';
+import 'package:jakbites_mobile/admin/food_form.dart';
 import 'package:jakbites_mobile/admin/restaurant_form.dart';
+import 'package:jakbites_mobile/food/models/food_model.dart';
+import 'package:jakbites_mobile/models/resutarant_model.dart';
 import 'package:jakbites_mobile/widgets/left_drawer.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
-// import 'package:jakbites_mobile/models/food_model.dart'; // Uncomment when Food model is available
-// import 'package:jakbites_mobile/admin/food_form.dart'; // Uncomment when FoodFormPage is implemented
-import 'dart:convert';
 
 class AdminPage extends StatefulWidget {
   const AdminPage({super.key});
@@ -19,7 +19,7 @@ class _AdminPageState extends State<AdminPage> {
   int _currentIndex = 0; // 0 for Restaurant, 1 for Food
   String searchQuery = "";
   List<Restaurant> restaurants = [];
-  // List<Food> foods = []; // Placeholder for Food items
+  List<Food> foods = [];
 
   @override
   void initState() {
@@ -31,17 +31,18 @@ class _AdminPageState extends State<AdminPage> {
     final request = context.read<CookieRequest>();
     if (_currentIndex == 0) {
       // Fetch Restaurants
-      final response = await request.get(
-          'http://localhost:8000/get_restaurants_flutter/');
+      final response = await request.get('http://localhost:8000/json-restaurant/');
+      if (!mounted) return;
       setState(() {
         restaurants = restaurantFromJson(jsonEncode(response));
       });
     } else {
-      // Fetch Foods (to be implemented)
-      // final response = await request.get('http://localhost:8000/get_foods_flutter/');
-      // setState(() {
-      //   foods = foodFromJson(jsonEncode(response));
-      // });
+      // Fetch Foods
+      final response = await request.get('http://localhost:8000/json-food/');
+      if (!mounted) return;
+      setState(() {
+        foods = foodFromJson(jsonEncode(response));
+      });
     }
   }
 
@@ -63,11 +64,11 @@ class _AdminPageState extends State<AdminPage> {
         ),
       ).then((value) => fetchItems());
     } else {
-      // Add Food (to be implemented)
-      // Navigator.push(
-      //   context,
-      //   MaterialPageRoute(builder: (context) => const FoodFormPage()),
-      // ).then((value) => fetchItems());
+      // Add Food
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const FoodFormPage()),
+      ).then((value) => fetchItems());
     }
   }
 
@@ -81,11 +82,13 @@ class _AdminPageState extends State<AdminPage> {
         ),
       ).then((value) => fetchItems());
     } else {
-      // Edit Food (to be implemented)
-      // Navigator.push(
-      //   context,
-      //   MaterialPageRoute(builder: (context) => FoodFormPage(food: item)),
-      // ).then((value) => fetchItems());
+      // Edit Food
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => FoodFormPage(food: item),
+        ),
+      ).then((value) => fetchItems());
     }
   }
 
@@ -94,7 +97,7 @@ class _AdminPageState extends State<AdminPage> {
     if (_currentIndex == 0) {
       // Delete Restaurant
       final response = await request.postJson(
-        'http://localhost:8000/delete_restaurant_flutter/',
+        'http://localhost:8000/authentication/delete_restaurant_flutter/',
         jsonEncode({"id": id}),
       );
       if (response['status'] == 'success') {
@@ -108,21 +111,21 @@ class _AdminPageState extends State<AdminPage> {
         );
       }
     } else {
-      // Delete Food (to be implemented)
-      // final response = await request.postJson(
-      //   'http://localhost:8000/delete_food_flutter/',
-      //   jsonEncode({"id": id}),
-      // );
-      // if (response['status'] == 'success') {
-      //   ScaffoldMessenger.of(context).showSnackBar(
-      //     const SnackBar(content: Text('Food deleted successfully')),
-      //   );
-      //   fetchItems();
-      // } else {
-      //   ScaffoldMessenger.of(context).showSnackBar(
-      //     const SnackBar(content: Text('Failed to delete food')),
-      //   );
-      // }
+      // Delete Food
+      final response = await request.postJson(
+        'http://localhost:8000/authentication/delete_food_flutter/',
+        jsonEncode({"id": id}),
+      );
+      if (response['status'] == 'success') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Food deleted successfully')),
+        );
+        fetchItems();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to delete food')),
+        );
+      }
     }
   }
 
@@ -158,11 +161,9 @@ class _AdminPageState extends State<AdminPage> {
       drawer: const LeftDrawer(),
       body: Column(
         children: [
-          // List of Items
           Expanded(
             child: ListView.builder(
-              itemCount: _currentIndex == 0 ? restaurants.length : 0,
-              // Replace 0 with foods.length when foods are implemented
+              itemCount: _currentIndex == 0 ? restaurants.length : foods.length,
               itemBuilder: (context, index) {
                 if (_currentIndex == 0) {
                   // Restaurant item
@@ -208,9 +209,50 @@ class _AdminPageState extends State<AdminPage> {
                     ],
                   );
                 } else {
-                  // Food item placeholder
-                  // ...existing code...
-                  return const SizedBox.shrink();
+                  // Food item
+                  Food food = foods[index];
+                  String foodName = food.fields.name;
+                  String foodCategory = food.fields.category;
+                  if (searchQuery.isNotEmpty &&
+                      !foodName.toLowerCase().contains(searchQuery.toLowerCase()) &&
+                      !foodCategory.toLowerCase().contains(searchQuery.toLowerCase())) {
+                    return const SizedBox.shrink();
+                  }
+                  return ExpansionTile(
+                    title: Text(
+                      foodName,
+                      style: const TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    children: [
+                      ListTile(
+                        title: Text('Category: $foodCategory'),
+                        subtitle: Text('Price: \$${food.fields.price.toString()}'),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton(
+                            onPressed: () => editItem(food),
+                            child: const Text(
+                              'Edit',
+                              style: TextStyle(color: Colors.blue),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () => deleteItem(food.pk),
+                            child: const Text(
+                              'Delete',
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
                 }
               },
             ),
