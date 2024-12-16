@@ -107,7 +107,7 @@ class _AdminPageState extends State<AdminPage> {
         fetchItems();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to delete restaurant')),
+          SnackBar(content: Text(response['message'] ?? 'Failed to delete restaurant')),
         );
       }
     } else {
@@ -116,6 +116,7 @@ class _AdminPageState extends State<AdminPage> {
         'http://localhost:8000/authentication/delete_food_flutter/',
         jsonEncode({"id": id}),
       );
+
       if (response['status'] == 'success') {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Food deleted successfully')),
@@ -123,7 +124,7 @@ class _AdminPageState extends State<AdminPage> {
         fetchItems();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to delete food')),
+          SnackBar(content: Text(response['message'] ?? 'Failed to delete food')),
         );
       }
     }
