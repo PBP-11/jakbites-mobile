@@ -102,12 +102,20 @@ class _AdminPageState extends State<AdminPage> {
       );
       if (response['status'] == 'success') {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Restaurant deleted successfully')),
+          const SnackBar(
+            content: Text('Restaurant deleted successfully'),
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.only(bottom: 16, left: 16, right: 16),
+          ),
         );
         fetchItems();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'] ?? 'Failed to delete restaurant')),
+          SnackBar(
+            content: Text(response['message'] ?? 'Failed to delete restaurant'),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
+          ),
         );
       }
     } else {
@@ -119,12 +127,20 @@ class _AdminPageState extends State<AdminPage> {
 
       if (response['status'] == 'success') {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Food deleted successfully')),
+          const SnackBar(
+            content: Text('Food deleted successfully'),
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.only(bottom: 16, left: 16, right: 16),
+          ),
         );
         fetchItems();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'] ?? 'Failed to delete food')),
+          SnackBar(
+            content: Text(response['message'] ?? 'Failed to delete food'),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
+          ),
         );
       }
     }
@@ -245,8 +261,83 @@ class _AdminPageState extends State<AdminPage> {
                     ),
                   );
                 } else {
-                  // Food item (similar changes as restaurant item)
-                  // ... (similar modifications as above)
+                  // Food item
+                  Food food = foods[index];
+                  String foodName = food.fields.name;
+                  String foodCategory = food.fields.category;
+                  if (searchQuery.isNotEmpty &&
+                      !foodName.toLowerCase().contains(searchQuery.toLowerCase()) &&
+                      !foodCategory.toLowerCase().contains(searchQuery.toLowerCase())) {
+                    return const SizedBox.shrink();
+                  }
+                  return Card(
+                    margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
+                    child: ExpansionTile(
+                      title: Text(
+                        foodName,
+                        style: const TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Category: $foodCategory',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                              Text(
+                                'Price: ${food.fields.price.toString()}',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                              const SizedBox(height: 16.0),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  ElevatedButton(
+                                    onPressed: () => editItem(food),
+                                    style: ElevatedButton.styleFrom(
+                                      foregroundColor: Colors.white,
+                                      backgroundColor: Colors.black,
+                                      minimumSize: const Size(80, 48),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10.0),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                    ),
+                                    child: const Text('Edit'),
+                                  ),
+                                  const SizedBox(width: 8.0),
+                                  ElevatedButton(
+                                    onPressed: () => deleteItem(food.pk),
+                                    style: ElevatedButton.styleFrom(
+                                      foregroundColor: Colors.white,
+                                      backgroundColor: Colors.black87,
+                                      minimumSize: const Size(80, 48),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10.0),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                    ),
+                                    child: const Text('Delete'),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
                 }
               },
             ),

@@ -40,7 +40,6 @@ class _FoodFormPageState extends State<FoodFormPage> {
   Future<void> fetchRestaurants() async {
     final request = context.read<CookieRequest>();
     final response = await request.get('http://localhost:8000/json_restaurant/');
-    print("Restaurant Response: $response"); // For debugging
     if (!mounted) return;
     
     // The response is already decoded by the CookieRequest class
@@ -236,6 +235,7 @@ class _FoodFormPageState extends State<FoodFormPage> {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text("Food updated successfully!"),
+                                  behavior: SnackBarBehavior.floating,
                                 ),
                               );
                               Navigator.pop(context);
@@ -244,6 +244,7 @@ class _FoodFormPageState extends State<FoodFormPage> {
                                 SnackBar(
                                   content: Text(response['message'] ??
                                       "Failed to update food."),
+                                  behavior: SnackBarBehavior.floating,
                                 ),
                               );
                             }
@@ -263,6 +264,7 @@ class _FoodFormPageState extends State<FoodFormPage> {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text("New food saved successfully!"),
+                                  behavior: SnackBarBehavior.floating,
                                 ),
                               );
                               Navigator.pop(context);
@@ -271,6 +273,7 @@ class _FoodFormPageState extends State<FoodFormPage> {
                                 SnackBar(
                                   content: Text(response['message'] ??
                                       "Failed to save food."),
+                                  behavior: SnackBarBehavior.floating,
                                 ),
                               );
                             }

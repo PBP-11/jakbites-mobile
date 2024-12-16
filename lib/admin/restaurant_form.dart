@@ -129,6 +129,7 @@ class _RestaurantFormPageState extends State<RestaurantFormPage> {
                                 const SnackBar(
                                   content:
                                       Text("Restaurant updated successfully!"),
+                                  behavior: SnackBarBehavior.floating,
                                 ),
                               );
                               Navigator.pop(context);
@@ -137,6 +138,7 @@ class _RestaurantFormPageState extends State<RestaurantFormPage> {
                                 SnackBar(
                                   content: Text(response['message'] ??
                                       "Failed to update restaurant."),
+                                  behavior: SnackBarBehavior.floating,
                                 ),
                               );
                             }
@@ -154,6 +156,7 @@ class _RestaurantFormPageState extends State<RestaurantFormPage> {
                                 const SnackBar(
                                   content: Text(
                                       "New restaurant saved successfully!"),
+                                  behavior: SnackBarBehavior.floating,
                                 ),
                               );
                               Navigator.pop(context);
@@ -162,6 +165,7 @@ class _RestaurantFormPageState extends State<RestaurantFormPage> {
                                 SnackBar(
                                   content: Text(response['message'] ??
                                       "Failed to save restaurant."),
+                                  behavior: SnackBarBehavior.floating,
                                 ),
                               );
                             }
