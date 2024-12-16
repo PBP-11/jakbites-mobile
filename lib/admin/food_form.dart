@@ -255,7 +255,7 @@ class _FoodFormPageState extends State<FoodFormPage> {
                                 "name": _name,
                                 "description": _description,
                                 "category": _category,
-                                "restaurant": _restaurantId, // Changed from restaurant_id to restaurant
+                                "restaurant_id": _restaurantId, // Changed from 'restaurant' to 'restaurant_id'
                                 "price": int.parse(_price),
                               }),
                             );
