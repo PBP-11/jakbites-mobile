@@ -39,10 +39,16 @@ class _FoodFormPageState extends State<FoodFormPage> {
 
   Future<void> fetchRestaurants() async {
     final request = context.read<CookieRequest>();
-    final response = await request.get('http://localhost:8000/json-restaurant/');
+    final response = await request.get('http://localhost:8000/json_restaurant/');
+    print("Restaurant Response: $response"); // For debugging
     if (!mounted) return;
+    
+    // The response is already decoded by the CookieRequest class
     setState(() {
-      restaurants = restaurantFromJson(jsonEncode(response));
+      // Directly use the response data without additional jsonEncode
+      restaurants = List<Restaurant>.from(
+        response.map((data) => Restaurant.fromJson(data))
+      );
     });
   }
 
@@ -222,7 +228,7 @@ class _FoodFormPageState extends State<FoodFormPage> {
                                 "name": _name,
                                 "description": _description,
                                 "category": _category,
-                                "restaurant_id": _restaurantId,
+                                "restaurant": _restaurantId, // Changed from restaurant_id to restaurant
                                 "price": int.parse(_price),
                               }),
                             );
@@ -249,7 +255,7 @@ class _FoodFormPageState extends State<FoodFormPage> {
                                 "name": _name,
                                 "description": _description,
                                 "category": _category,
-                                "restaurant_id": _restaurantId,
+                                "restaurant": _restaurantId, // Changed from restaurant_id to restaurant
                                 "price": int.parse(_price),
                               }),
                             );
