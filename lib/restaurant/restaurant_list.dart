@@ -80,7 +80,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
                           onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => RestaurantPageDetail(snapshot.data![index]),
+                              builder: (context) => RestaurantPageDetail(snapshot.data![index], true),
                             ),
                           ),
                           child: Column(

@@ -81,15 +81,17 @@ class _RestaurantReviewState extends State<RestaurantReview> {
                         },
                         validator: (String? value) {
                           if (value == null || value.isEmpty) {
-                            return "rating Produk tidak boleh kosong!";
+                            return "Rating Restaurant tidak boleh kosong!";
                           }
                           if (int.tryParse(value) == null) {
-                            return "rating Produk harus berupa angka!";
+                            return "Rating Restaurant harus berupa angka!";
                           } 
                           if (int.tryParse(value) != null) {
                             int tmpHargaProduk = int.parse(value);
                             if (tmpHargaProduk <= 0) {
-                              return "Produknya tak ada?";
+                              return "Reviewnya tak ada? (1-5)";
+                            } else if (tmpHargaProduk >= 6) {
+                              return "Puas banget kayanya... (1-5)";
                             }
                           }
                           return null;
@@ -111,7 +113,7 @@ class _RestaurantReviewState extends State<RestaurantReview> {
                                 context: context,
                                 builder: (context) {
                                   return AlertDialog(
-                                    title: const Text('Produk telah berhasil tersimpan'),
+                                    title: const Text('Review anda telah berhasil tersimpan'),
                                     content: SingleChildScrollView(
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -130,12 +132,9 @@ class _RestaurantReviewState extends State<RestaurantReview> {
                                         // },
                                         onPressed: () async {
                                           if (_formkey.currentState!.validate()) {
-                                              // Kirim ke Django dan tunggu respons
-                                              // TODO: Ganti URL dan jangan lupa tambahkan trailing slash (/) di akhir URL!
                                               final response = await request.postJson(
                                                   "http://localhost:8000/restaurant/crf/",
                                                   jsonEncode(<String, dynamic>{
-                                                  // TODO: Sesuaikan field data sesuai dengan aplikasimu
                                                     'restaurant': widget.resto.pk,
                                                     'review': _reviewRestaurant,
                                                     'rating': _ratingRestaurant,
@@ -149,7 +148,7 @@ class _RestaurantReviewState extends State<RestaurantReview> {
                                                       ));
                                                       Navigator.pushReplacement(
                                                           context,
-                                                          MaterialPageRoute(builder: (context) => RestaurantPageDetail(widget.resto)),
+                                                          MaterialPageRoute(builder: (context) => RestaurantPageDetail(widget.resto, true)),
                                                       );
                                                   } else {
                                                       ScaffoldMessenger.of(context)

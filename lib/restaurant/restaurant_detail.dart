@@ -9,16 +9,33 @@ import 'add_review_restaurant.dart';
 import 'package:jakbites_mobile/food/models/food_model.dart';
 import 'package:jakbites_mobile/food/screens/food_detail.dart';
 import 'package:jakbites_mobile/food/screens/food_list.dart';
+import 'package:http/http.dart' as http;
 
 class RestaurantPageDetail extends StatefulWidget {
   final Restaurant resto;
-  RestaurantPageDetail(this.resto, {super.key});
+  var isMenu;
+  RestaurantPageDetail(this.resto, this.isMenu, {super.key});
 
   @override
   State<RestaurantPageDetail> createState() => _RestaurantPageDetailState();
 }
 
 class _RestaurantPageDetailState extends State<RestaurantPageDetail> {  
+
+  Future deleteReview(int id) async {
+    // print(id);
+  final http.Response response = await http.delete(
+    Uri.parse('http://localhost:8000/restaurant/drf/'),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      },
+    body: jsonEncode(<String, int>{
+      'deleteID': id,
+    }),
+    );  
+    return;
+  }
+
   Future<List<Food>> fetchFood(CookieRequest request) async {
     final response =
         await request.get('http://127.0.0.1:8000/json_food/');
@@ -37,42 +54,28 @@ class _RestaurantPageDetailState extends State<RestaurantPageDetail> {
     }
     return listFood;
   }
-  // print(context.watch<CookieRequest>);
+
   double avg_rating = 0.0;
-  Future<List<String>> fetchReviewRestaurant(CookieRequest request) async {
-    final response = await request.get('http://localhost:8000/json_review_restaurant/');
-    
+  Future<List<ReviewRestaurant>> fetchReviewRestaurant(CookieRequest request) async {
+    final response =await request.get('http://localhost:8000/json_review_restaurant/');
+
     // Melakukan decode response menjadi bentuk json
     var data = response;
-    // print(data);
-    
-    // Melakukan konversi data json menjadi object MoodEntry
-    List<String> listReviewerName = [];
-    List<String> listReviewRestaurant = [];
+
+    // Melakukan konversi data json menjadi object Food
+    List<ReviewRestaurant> listReviewRestaurant = [];
     List<int> ratingRestaurant = [];
-    // print(widget.resto.pk == );
     for (var d in data['data']) {
-      // print(d["restaurant"]);
-      // print(widget.resto.pk);
       if (d != null) {
-        // print(d['data']["restaurant"]);
-        if (d["restaurant"] == widget.resto.pk) {
-          // print(d);
-          // listReviewerName.add(d['user']);
-          var temp = d['user']+': '+d["rating"].toString()+'⭐   '+d['review'];
-          listReviewRestaurant.add(temp);
-          // listReviewRestaurant.add(ReviewRestaurant.fromJson(d));
+        if (d['restaurant'] == widget.resto.pk) {
           ratingRestaurant.add(d["rating"]);
+          listReviewRestaurant.add(ReviewRestaurant.fromJson(d));
         }
       }
     }
-    // print(ratingRestaurant);
     avg_rating = ratingRestaurant.reduce((a, b) => a + b) / ratingRestaurant.length;
-
     return listReviewRestaurant;
   }
-
-  bool ismenu = true;
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +86,7 @@ class _RestaurantPageDetailState extends State<RestaurantPageDetail> {
         child: Align(
         child: Column(
         children: [
-          Flexible(child: FutureBuilder(
+          FutureBuilder(
             future: fetchReviewRestaurant(request), 
             builder: (context, AsyncSnapshot snapshot) {
               return Builder(
@@ -113,8 +116,6 @@ class _RestaurantPageDetailState extends State<RestaurantPageDetail> {
               );
             }
           ),
-          ),
-          Flexible(child: 
             Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,7 +126,7 @@ class _RestaurantPageDetailState extends State<RestaurantPageDetail> {
                 child: TextButton(
                   onPressed: () {
                     setState(() {
-                      ismenu = true;
+                      widget.isMenu = true;
                     });
                   }, 
                   child: Container(
@@ -139,7 +140,7 @@ class _RestaurantPageDetailState extends State<RestaurantPageDetail> {
                 child: TextButton(
                   onPressed: () {
                     setState(() {
-                      ismenu = false;
+                      widget.isMenu = false;
                     });
                   },  
                   child: Container(
@@ -150,10 +151,9 @@ class _RestaurantPageDetailState extends State<RestaurantPageDetail> {
               ),
             ],
           ),
-          ),
           Flexible(
             child: 
-            !ismenu? Column(
+            !widget.isMenu? Column(
               children: [
                 Card(
                 // MainAxisAlignment: MainAxisAlignment.start,
@@ -170,12 +170,15 @@ class _RestaurantPageDetailState extends State<RestaurantPageDetail> {
                     child: Text("Buat Review", style: TextStyle(color: Colors.black)),
                   ),
                   ),
-              ),
+              ), SizedBox(height: 10), 
                 Flexible(child: Container(
                   child: 
                   FutureBuilder(
                     future: fetchReviewRestaurant(request),
                     builder: (context, AsyncSnapshot snapshot) {
+                      if (snapshot.data == null) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else {
                         if (!snapshot.hasData) {
                           return const Column(
                             children: [
@@ -183,7 +186,6 @@ class _RestaurantPageDetailState extends State<RestaurantPageDetail> {
                                 'Belum Ada Review Makanan Pada JakBites',
                                 style: TextStyle(fontSize: 20, color: Colors.black),
                               ),
-                              SizedBox(height: 8),
                             ],
                           );
                         } else {
@@ -193,112 +195,97 @@ class _RestaurantPageDetailState extends State<RestaurantPageDetail> {
                               padding: const EdgeInsets.all(2),
                               child: Column(
                                 children: [
-                                  Card(
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
-                                    child: InkWell( 
-                                      child: Column(
-                                        children: <Widget>[
-                                            ListTile(
-                                              title: Text(
-                                                "${snapshot.data![index]}",
-                                                  style: const TextStyle(
-                                                    fontSize: 18.0,
-                                                    fontWeight: FontWeight.bold,
+                                  Builder(
+                                    builder: (context) {
+                                      if (1==1) {
+                                        return Card(
+                                          child: Column(
+                                            children: [
+                                              ListTile(
+                                                title: Text(
+                                                  "${snapshot.data![index].userName}: ${snapshot.data![index].rating}⭐",
+                                                    style: const TextStyle(
+                                                      fontSize: 14.0,
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
+                                                ),
+                                                subtitle: Text(
+                                                  "${snapshot.data![index].review}",
+                                                    style: const TextStyle(
+                                                      fontSize: 12.0,
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
                                                   ),
+                                                ),
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.end,
+                                                children: <Widget>[
+                                                  TextButton(
+                                                    child: const Text('Update Review',
+                                                    style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 10
+                                                    ),
+                                                    ),
+                                                    onPressed: () => deleteReview(
+                                                      snapshot.data![index].iD
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  TextButton(
+                                                    child: const Text('Delete Review',
+                                                    style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 10,
+                                                    ),
+                                                    ),
+                                                    onPressed: () => {deleteReview(snapshot.data![index].iD), Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) => RestaurantPageDetail(widget.resto, false),
+                                                      ),
+                                                    ),
+                                                    },
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                ],
+                                              ),
+                                            ],
+                                          )
+                                        );
+                                      } else {
+                                        return Card(
+                                          child: ListTile(
+                                          title: Text(
+                                            "${snapshot.data![index].userName}: ${snapshot.data![index].rating}⭐",
+                                              style: const TextStyle(
+                                                fontSize: 14.0,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                          ),
+                                          subtitle: Text(
+                                            "${snapshot.data![index].review}",
+                                              style: const TextStyle(
+                                                fontSize: 12.0,
+                                                fontWeight: FontWeight.bold,
                                               ),
                                             ),
-                                          ],
-                                        ),
-                                      ),
-                                      
-                                    ),
+                                          ),
+                                        );
+                                      }
+                                    }, 
+                                  ),
                                 ],
                               ),
                             ),
                           );
                         }
+                      };
                     },
                   ),
                 ))
               ],
-            ): 
-              FutureBuilder(
-        future: fetchFood(request),
-        builder: (context, AsyncSnapshot snapshot) {
-          if (snapshot.data == null) {
-            return const Center(child: CircularProgressIndicator());
-          } else {
-            if (!snapshot.hasData) {
-              return const Column(
-                children: [
-                  Text(
-                    'Belum ada data makanan pada JakBites',
-                    style: TextStyle(fontSize: 20, color: Color(0xff59A5D8)),
-                  ),
-                  SizedBox(height: 8),
-                ],
-              );
-            } else {
-              return ListView.builder(
-                itemCount: snapshot.data!.length,
-                itemBuilder: (_, index) => Container(
-                  padding: const EdgeInsets.all(2),
-                  child: Column(
-                    children: [
-                      Card(
-                        shape: const RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(8.0))),
-                        child: InkWell(
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  // FoodPageDetail(snapshot.data![index]),
-                                  FoodPage(),
-                            ),
-                          ),
-                          child: Column(
-                            children: <Widget>[
-                              ListTile(
-                                title: Text(
-                                  "${snapshot.data![index].fields.name}",
-                                  style: const TextStyle(
-                                    fontSize: 18.0,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                subtitle: Text(
-                                  "${snapshot.data![index].fields.category}",
-                                  style: const TextStyle(
-                                    fontSize: 12.0,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                trailing: const Icon(Icons.restaurant),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      // const Image(
-                      // image: AssetImage('lib/assets/images/resto.png'),
-                      // ),
-                      // Text(
-                      //   "${snapshot.data![index].fields.name}",
-                      //   style: const TextStyle(
-                      //     fontSize: 18.0,
-                      //     fontWeight: FontWeight.bold,
-                      //   ),
-                      // ),
-                    ],
-                  ),
-                ),
-              );
-            }
-          }
-        },
-      ),
+            ): Container(),
           ),
         ],
       ),

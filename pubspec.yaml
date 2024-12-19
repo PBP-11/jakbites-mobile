@@ -39,6 +39,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter_svg: ^2.0.16
   flutter_rating_bar: ^4.0.1
+  http: ^1.2.2
 
 dev_dependencies:
   flutter_test:

@@ -4,58 +4,43 @@
 
 import 'dart:convert';
 
-ReviewRestaurant reviewRestaurantFromJson(String str) => ReviewRestaurant.fromJson(json.decode(str));
+List<ReviewRestaurant> reviewRestaurantFromJson(String str) => List<ReviewRestaurant>.from(json.decode(str).map((x) => ReviewRestaurant.fromJson(x)));
 
-String reviewRestaurantToJson(ReviewRestaurant data) => json.encode(data.toJson());
+String reviewRestaurantToJson(List<ReviewRestaurant> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class ReviewRestaurant {
-    int status;
-    String message;
-    List<Datum> data;
+    int restaurant;
+    int userId;
+    int rating;
+    String review;
+    String userName;
+    int iD;
 
     ReviewRestaurant({
-        required this.status,
-        required this.message,
-        required this.data,
+        required this.restaurant,
+        required this.userId,
+        required this.rating,
+        required this.review,
+        required this.userName,
+        required this.iD,
     });
 
     factory ReviewRestaurant.fromJson(Map<String, dynamic> json) => ReviewRestaurant(
-        status: json["status"],
-        message: json["message"],
-        data: List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
-    );
-
-    Map<String, dynamic> toJson() => {
-        "status": status,
-        "message": message,
-        "data": List<dynamic>.from(data.map((x) => x.toJson())),
-    };
-}
-
-class Datum {
-    int restaurant;
-    String user;
-    int rating;
-    String review;
-
-    Datum({
-        required this.restaurant,
-        required this.user,
-        required this.rating,
-        required this.review,
-    });
-
-    factory Datum.fromJson(Map<String, dynamic> json) => Datum(
         restaurant: json["restaurant"],
-        user: json["user"],
+        userId: json["userID"],
         rating: json["rating"],
         review: json["review"],
+        userName: json["userName"],
+        iD: json["ID"]
     );
+
 
     Map<String, dynamic> toJson() => {
         "restaurant": restaurant,
-        "user": user,
+        "userID": userId,
         "rating": rating,
         "review": review,
+        "userName": userName,
+        "iD" : iD,
     };
 }
