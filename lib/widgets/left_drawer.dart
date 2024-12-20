@@ -7,7 +7,9 @@ import 'package:jakbites_mobile/main/menu.dart';
 import 'package:jakbites_mobile/restaurant/restaurant_list.dart';
 import 'package:jakbites_mobile/user/profile.dart';
 // import 'package:jakbites_mobile/list_ProductEntry.dart';
-// import 'package:jakbites_mobile/food_resto.dart'; // Import Food Resto screen
+import 'package:jakbites_mobile/food/screens/food_detail.dart'; // Import Food Resto screen
+import 'package:jakbites_mobile/food/screens/food_list.dart'; // Import Food Resto screen
+
 // import 'package:jakbites_mobile/auth/login.dart'; // Import Login screen
 
 class LeftDrawer extends StatelessWidget {
