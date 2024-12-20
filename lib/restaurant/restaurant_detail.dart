@@ -13,8 +13,9 @@ import 'package:http/http.dart' as http;
 
 class RestaurantPageDetail extends StatefulWidget {
   final Restaurant resto;
-  var isMenu;
+  var isMenu = true;
   RestaurantPageDetail(this.resto, this.isMenu, {super.key});
+
 
   @override
   State<RestaurantPageDetail> createState() => _RestaurantPageDetailState();
@@ -36,25 +37,6 @@ class _RestaurantPageDetailState extends State<RestaurantPageDetail> {
     return;
   }
 
-  Future<List<Food>> fetchFood(CookieRequest request) async {
-    final response =
-        await request.get('http://127.0.0.1:8000/json_food/');
-
-    // Melakukan decode response menjadi bentuk json
-    var data = response;
-
-    // Melakukan konversi data json menjadi object Food
-    List<Food> listFood = [];
-    for (var d in data) {
-      if (d != null) {
-        if (d['restaurant'] == widget.resto.pk) {
-          listFood.add(Food.fromJson(d));
-        }
-      }
-    }
-    return listFood;
-  }
-
   double avg_rating = 0.0;
   Future<List<ReviewRestaurant>> fetchReviewRestaurant(CookieRequest request) async {
     final response =await request.get('http://localhost:8000/json_review_restaurant/');
@@ -65,6 +47,7 @@ class _RestaurantPageDetailState extends State<RestaurantPageDetail> {
     // Melakukan konversi data json menjadi object Food
     List<ReviewRestaurant> listReviewRestaurant = [];
     List<int> ratingRestaurant = [];
+    
     for (var d in data['data']) {
       if (d != null) {
         if (d['restaurant'] == widget.resto.pk) {
@@ -73,7 +56,9 @@ class _RestaurantPageDetailState extends State<RestaurantPageDetail> {
         }
       }
     }
-    avg_rating = ratingRestaurant.reduce((a, b) => a + b) / ratingRestaurant.length;
+
+    ratingRestaurant.isEmpty? avg_rating = 0 : avg_rating = ratingRestaurant.reduce((a, b) => a + b) / ratingRestaurant.length;
+    // avg_rating = ratingRestaurant.reduce((a, b) => a + b) / ratingRestaurant.length;
     return listReviewRestaurant;
   }
 
@@ -115,6 +100,9 @@ class _RestaurantPageDetailState extends State<RestaurantPageDetail> {
                 ),
               );
             }
+          ),
+          SizedBox(
+            height: 15,
           ),
             Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -162,7 +150,8 @@ class _RestaurantPageDetailState extends State<RestaurantPageDetail> {
                   onPressed: () {
                     Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => RestaurantReview(widget.resto)),
+                    MaterialPageRoute(builder: (context) => RestaurantReview(-64, widget.resto, () {setState(() {
+                    });})),
                   );
                   }, 
                   child: Container(
@@ -178,15 +167,17 @@ class _RestaurantPageDetailState extends State<RestaurantPageDetail> {
                     builder: (context, AsyncSnapshot snapshot) {
                       if (snapshot.data == null) {
                         return const Center(child: CircularProgressIndicator());
-                      } else {
-                        if (!snapshot.hasData) {
-                          return const Column(
-                            children: [
-                              Text(
-                                'Belum Ada Review Makanan Pada JakBites',
-                                style: TextStyle(fontSize: 20, color: Colors.black),
+                      } else {  
+                        if (snapshot.data.length==0) {
+                          return Container(
+                            alignment: Alignment.center,
+                            child: const Text('Yuk tambahkan reviewmu!',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ],
                           );
                         } else {
                           return ListView.builder(
@@ -227,9 +218,13 @@ class _RestaurantPageDetailState extends State<RestaurantPageDetail> {
                                                       fontSize: 10
                                                     ),
                                                     ),
-                                                    onPressed: () => deleteReview(
-                                                      snapshot.data![index].iD
-                                                    ),
+                                                    onPressed: () => Navigator.push(
+                                                      context,
+                                                        MaterialPageRoute(builder: (context) => 
+                                                        RestaurantReview(snapshot.data![index].iD,widget.resto, () 
+                                                        {setState(() {});}
+                                                        )),
+                                                        ),
                                                   ),
                                                   const SizedBox(width: 8),
                                                   TextButton(
@@ -239,12 +234,12 @@ class _RestaurantPageDetailState extends State<RestaurantPageDetail> {
                                                       fontSize: 10,
                                                     ),
                                                     ),
-                                                    onPressed: () => {deleteReview(snapshot.data![index].iD), Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (context) => RestaurantPageDetail(widget.resto, false),
-                                                      ),
-                                                    ),
+                                                    onPressed: () => {
+                                                      deleteReview(snapshot.data![index].iD),
+                                                      fetchReviewRestaurant(request),
+                                                      setState(() {
+                                                        }
+                                                      )
                                                     },
                                                   ),
                                                   const SizedBox(width: 8),
