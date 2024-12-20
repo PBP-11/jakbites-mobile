@@ -117,7 +117,7 @@ class _RestaurantFormPageState extends State<RestaurantFormPage> {
                           if (isEdit) {
                             // Edit existing restaurant
                             final response = await request.postJson(
-                              "https://william-matthew31-jakbites.pbp.cs.ui.ac.id/edit_restaurant_flutter/",
+                              "http://localhost:8000/authentication/edit_restaurant_flutter/",
                               jsonEncode({
                                 "id": widget.restaurant!.pk,
                                 "name": _name,
@@ -129,6 +129,7 @@ class _RestaurantFormPageState extends State<RestaurantFormPage> {
                                 const SnackBar(
                                   content:
                                       Text("Restaurant updated successfully!"),
+                                  behavior: SnackBarBehavior.floating,
                                 ),
                               );
                               Navigator.pop(context);
@@ -137,13 +138,14 @@ class _RestaurantFormPageState extends State<RestaurantFormPage> {
                                 SnackBar(
                                   content: Text(response['message'] ??
                                       "Failed to update restaurant."),
+                                  behavior: SnackBarBehavior.floating,
                                 ),
                               );
                             }
                           } else {
                             // Add new restaurant
                             final response = await request.postJson(
-                              "https://william-matthew31-jakbites.pbp.cs.ui.ac.id/create_restaurant_flutter/",
+                              "http://localhost:8000/authentication/create_restaurant_flutter/",
                               jsonEncode({
                                 "name": _name,
                                 "location": _location,
@@ -154,6 +156,7 @@ class _RestaurantFormPageState extends State<RestaurantFormPage> {
                                 const SnackBar(
                                   content: Text(
                                       "New restaurant saved successfully!"),
+                                  behavior: SnackBarBehavior.floating,
                                 ),
                               );
                               Navigator.pop(context);
@@ -162,6 +165,7 @@ class _RestaurantFormPageState extends State<RestaurantFormPage> {
                                 SnackBar(
                                   content: Text(response['message'] ??
                                       "Failed to save restaurant."),
+                                  behavior: SnackBarBehavior.floating,
                                 ),
                               );
                             }

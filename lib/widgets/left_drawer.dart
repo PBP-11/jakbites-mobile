@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:jakbites_mobile/admin/admin_page.dart';
 import 'package:jakbites_mobile/authentication/login.dart';
 import 'package:jakbites_mobile/admin/restaurant_form.dart';
+import 'package:jakbites_mobile/food/screens/food_list.dart';
 import 'package:jakbites_mobile/main/menu.dart';
 import 'package:jakbites_mobile/restaurant/restaurant_list.dart';
+import 'package:jakbites_mobile/user/profile.dart';
 // import 'package:jakbites_mobile/list_ProductEntry.dart';
 // import 'package:jakbites_mobile/food_resto.dart'; // Import Food Resto screen
 // import 'package:jakbites_mobile/auth/login.dart'; // Import Login screen
@@ -89,10 +91,10 @@ class LeftDrawer extends StatelessWidget {
                   icon: Icons.restaurant,
                   title: 'Foods',
                   onTap: () {
-                  //   Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(builder: (context) => const FoodRestoPage()),
-                  //   );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const FoodPage()),
+                    );
                   },
                 ),
                 _buildDrawerItem(
@@ -104,6 +106,17 @@ class LeftDrawer extends StatelessWidget {
                     context,
                     MaterialPageRoute(builder: (context) => const AdminPage()),
                   );
+                  },
+                ),
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.account_circle,
+                  title: 'Profile',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) =>const ProfilePage()),
+                    );
                   },
                 ),
               ],

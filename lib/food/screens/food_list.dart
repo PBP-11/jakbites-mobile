@@ -15,7 +15,7 @@ class FoodPage extends StatefulWidget {
 class _FoodPageState extends State<FoodPage> {
   Future<List<Food>> fetchFood(CookieRequest request) async {
     final response =
-        await request.get('http://127.0.0.1:8000/json_food/');
+        await request.get('http://localhost:8000/json_food/');
 
     // Melakukan decode response menjadi bentuk json
     var data = response;
