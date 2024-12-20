@@ -8,6 +8,14 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
+enum iniAngka {
+  one,
+  two,
+  three,
+  four,
+  five,
+}
+
 class RestaurantReview extends StatefulWidget {
   final Function onSubmmit;
   final Restaurant resto;
@@ -20,6 +28,7 @@ class RestaurantReview extends StatefulWidget {
 }
 
 class _RestaurantReviewState extends State<RestaurantReview> {
+  iniAngka _ratingRestaurantEnum = iniAngka.one;
   final _formkey = GlobalKey<FormState>();
   int _ratingRestaurant = -1;
 	String _reviewRestaurant = "";
@@ -32,7 +41,7 @@ class _RestaurantReviewState extends State<RestaurantReview> {
       appBar: AppBar(
         title: const Center(
           child: Text(
-            'Review',
+            'Tambahkan Review',
           ),
         ),
         backgroundColor: Theme.of(context).colorScheme.primary,
@@ -51,6 +60,7 @@ class _RestaurantReviewState extends State<RestaurantReview> {
                   decoration: InputDecoration(
                     hintText: "Rating",
                     labelText: "Rating",
+                    isDense: true,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(5.0),
                     ),
@@ -81,39 +91,41 @@ class _RestaurantReviewState extends State<RestaurantReview> {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  maxLength: 255,
-                  decoration: InputDecoration(
-                    hintText: "Review",
-                    labelText: "Review",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5.0),
+                child: SizedBox(
+                  child: TextFormField(
+                    maxLength: 255,
+                    decoration: InputDecoration(
+                      hintText: "Review",
+                      labelText: "Review",
+                      isDense: true,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
                     ),
+                    onChanged: (String? value) {
+                      setState(() {
+                        _reviewRestaurant = value!;
+                      });
+                    },
+                    validator: (String? value) {
+                      if (value == null || value.isEmpty) {
+                        return "Review produk tidak boleh kosong!";
+                      }
+                      return null;
+                    },
                   ),
-                  onChanged: (String? value) {
-                    setState(() {
-                      _reviewRestaurant = value!;
-                    });
-                  },
-                  validator: (String? value) {
-                    if (value == null || value.isEmpty) {
-                      return "Review produk tidak boleh kosong!";
-                    }
-                    return null;
-                  },
                 ),
               ),
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.all(
-                          Theme.of(context).colorScheme.primary),
-                    ),
-                    onPressed: () async {
-                      if (_formkey.currentState!.validate()) {
+                  child: Card(
+                // MainAxisAlignment: MainAxisAlignment.start,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
+                    child: TextButton(
+                      onPressed: () async {
+                        if (_formkey.currentState!.validate()) {
                           var response;
                           if (widget.reviewID >= 0) {
                             response = await http.put(
@@ -164,12 +176,13 @@ class _RestaurantReviewState extends State<RestaurantReview> {
                                 }
                               }
                           }
-                      }
-                    },
-                    child: const Text(
-                      "Save",
-                      style: TextStyle(color: Colors.white),
-                    ),
+                        }
+                      }, 
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        child: Text("Simpan Review", style: TextStyle(color: Colors.black)),
+                      ),
+                      ),
                   ),
                 ),
               ),
