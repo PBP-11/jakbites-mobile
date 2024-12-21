@@ -58,3 +58,59 @@ class SearchItem {
     return json.encode(List<dynamic>.from(list.map((x) => x.toJson())));
   }
 }
+
+class SearchFood {
+  final int foodId;
+  final String foodName;
+  final String category;
+  final int price;
+  final String description;
+  final int restaurantId;
+  final String restaurantName;
+  final String location;
+
+  SearchFood({
+    required this.foodId,
+    required this.foodName,
+    required this.category,
+    required this.price,
+    required this.description,
+    required this.restaurantId,
+    required this.restaurantName,
+    required this.location,
+  });
+
+  factory SearchFood.fromJson(Map<String, dynamic> json) {
+    return SearchFood(
+      foodId: json['food_id'],
+      foodName: json['food_name'],
+      category: json['category'],
+      price: json['price'],
+      description: json['description'],
+      restaurantId: json['restaurant']['restaurant_id'],
+      restaurantName: json['restaurant']['restaurant_name'],
+      location: json['restaurant']['location'],
+    );
+  }
+}
+
+/// Model for "restaurant" object returned from 'restaurants'
+class SearchResto {
+  final int restaurantId;
+  final String restaurantName;
+  final String location;
+
+  SearchResto({
+    required this.restaurantId,
+    required this.restaurantName,
+    required this.location,
+  });
+
+  factory SearchResto.fromJson(Map<String, dynamic> json) {
+    return SearchResto(
+      restaurantId: json['restaurant_id'],
+      restaurantName: json['restaurant_name'],
+      location: json['location'],
+    );
+  }
+}
