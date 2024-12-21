@@ -4,6 +4,22 @@ import 'package:jakbites_mobile/models/menu_model.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+// Import your Restaurant model & detail page:
+import 'package:jakbites_mobile/models/resutarant_model.dart' as RestoModel;
+import 'package:jakbites_mobile/restaurant/restaurant_detail.dart';
+
+// Import your Food model & detail page:
+import 'package:jakbites_mobile/food/models/food_model.dart' as FoodModel;
+import 'package:jakbites_mobile/food/screens/food_detail.dart';
+
+// Example of a simplified color palette for consistency
+const Color kBackgroundColor = Color(0xFFD1D5DB); // Main background
+const Color kPrimaryTextColor = Color(0xFF292929); // Dark text
+const Color kAccentColor = Colors.amber;           // Accent
+const Color kLightGrey = Color(0xFFE5E5E5);        // Light grey
+const Color kDarkGrey = Color(0xFF757575);         // Dark grey
+const Color kWhite = Colors.white;                 // White
+
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
 
@@ -22,7 +38,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
     if (response.statusCode == 200) {
       List data = jsonDecode(response.body);
-      List<SearchItem> items = data.map((item) => SearchItem.fromJson(item)).toList().cast<SearchItem>();
+      List<SearchItem> items = data
+          .map((item) => SearchItem.fromJson(item))
+          .toList()
+          .cast<SearchItem>();
       return items;
     } else {
       throw Exception('Failed to load menu items');
@@ -46,8 +65,9 @@ class _MyHomePageState extends State<MyHomePage> {
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
+          // ------------------- App Bar -------------------
           SliverAppBar(
-            backgroundColor: const Color(0xFFD1D5DB),
+            backgroundColor: kBackgroundColor,
             pinned: true,
             expandedHeight: 150.0,
             centerTitle: false,
@@ -70,7 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   style: TextStyle(
                     fontSize: screenWidth * 0.035,
                     fontWeight: FontWeight.w800,
-                    color: const Color(0xFF292929),
+                    color: kPrimaryTextColor,
                     letterSpacing: 0.5,
                   ),
                 ),
@@ -88,36 +108,96 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
           ),
+
+          // ------------------- Body -------------------
           SliverToBoxAdapter(
             child: Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFFd1d5db),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.shade300,
-                    blurRadius: 10,
-                    offset: const Offset(0, -3),
-                  ),
-                ],
-              ),
+              color: kBackgroundColor,
               child: Padding(
                 padding: EdgeInsets.all(screenWidth * 0.04),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    SizedBox(height: screenHeight * 0.01),
-                    Text(
-                      'Calorie lovers, langsung cari aja disini!',
-                     style: TextStyle(
-                      fontSize: screenWidth * 0.03,
-                      fontStyle: FontStyle.italic,
-                      color: Colors.grey.shade800,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    ),
-                    SizedBox(height: screenHeight * 0.02),
+                    // ---- 1) "Resto." and "Eats." box ----
+                    Container(
+                      width: double.infinity,
+                      margin: EdgeInsets.only(bottom: screenHeight * 0.03),
+                      decoration: BoxDecoration(
+                        color: kWhite,
+                        borderRadius: BorderRadius.circular(25),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            spreadRadius: 2,
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      padding: EdgeInsets.symmetric(
+                        vertical: screenHeight * 0.04,  // vertical padding
+                        horizontal: screenWidth * 0.06, // horizontal padding
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // First row (Resto)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              RichText(
+                                text: TextSpan(
+                                  style: TextStyle(
+                                    fontSize: screenWidth * 0.25,
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.bold,
+                                    color: kPrimaryTextColor,
+                                  ),
+                                  children: [
+                                    const TextSpan(text: 'Resto'),
+                                    TextSpan(
+                                      text: '.',
+                                      style: TextStyle(
+                                        color: kAccentColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: screenHeight * 0.03),
 
-                    // Buttons to select mode
+                          // Second row (Eats)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              RichText(
+                                text: TextSpan(
+                                  style: TextStyle(
+                                    fontSize: screenWidth * 0.25,
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.bold,
+                                    color: kPrimaryTextColor,
+                                  ),
+                                  children: [
+                                    const TextSpan(text: 'Eats'),
+                                    TextSpan(
+                                      text: '.',
+                                      style: TextStyle(
+                                        color: kAccentColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // ---- 2) Toggle Row (Resto / Food) ----
                     Row(
                       children: [
                         Flexible(
@@ -129,23 +209,25 @@ class _MyHomePageState extends State<MyHomePage> {
                             },
                             child: Container(
                               decoration: BoxDecoration(
-                                color: selectedCategory == 'resto' ? Colors.amber : Colors.grey.shade300,
-                                borderRadius: BorderRadius.only(
+                                color: selectedCategory == 'resto'
+                                    ? kAccentColor
+                                    : kLightGrey,
+                                borderRadius: const BorderRadius.only(
                                   topLeft: Radius.circular(12),
-                                  topRight: Radius.circular(0), // No right curve for connection
+                                  topRight: Radius.circular(0),
                                 ),
                                 boxShadow: selectedCategory == 'resto'
                                     ? [
                                         BoxShadow(
-                                          color: Colors.black26,
+                                          color: Colors.black.withOpacity(0.15),
                                           blurRadius: 6,
-                                          offset: Offset(0, 3), // Slightly raised
+                                          offset: const Offset(0, 3),
                                         ),
                                       ]
                                     : [],
                               ),
-                              padding: EdgeInsets.symmetric(
-                                vertical: 12, // Adjust for desired height
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 12,
                               ),
                               alignment: Alignment.center,
                               child: Text(
@@ -153,7 +235,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: selectedCategory == 'resto' ? Colors.black : Colors.grey.shade700,
+                                  color: selectedCategory == 'resto'
+                                      ? kPrimaryTextColor
+                                      : kDarkGrey,
                                 ),
                               ),
                             ),
@@ -168,23 +252,25 @@ class _MyHomePageState extends State<MyHomePage> {
                             },
                             child: Container(
                               decoration: BoxDecoration(
-                                color: selectedCategory == 'food' ? Colors.amber : Colors.grey.shade300,
-                                borderRadius: BorderRadius.only(
+                                color: selectedCategory == 'food'
+                                    ? kAccentColor
+                                    : kLightGrey,
+                                borderRadius: const BorderRadius.only(
                                   topRight: Radius.circular(12),
-                                  topLeft: Radius.circular(0), // No left curve for connection
+                                  topLeft: Radius.circular(0),
                                 ),
                                 boxShadow: selectedCategory == 'food'
                                     ? [
                                         BoxShadow(
-                                          color: Colors.black26,
+                                          color: Colors.black.withOpacity(0.15),
                                           blurRadius: 6,
-                                          offset: Offset(0, 3), // Slightly raised
+                                          offset: const Offset(0, 3),
                                         ),
                                       ]
                                     : [],
                               ),
-                              padding: EdgeInsets.symmetric(
-                                vertical: 12, // Adjust for desired height
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 12,
                               ),
                               alignment: Alignment.center,
                               child: Text(
@@ -192,7 +278,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: selectedCategory == 'food' ? Colors.black : Colors.grey.shade700,
+                                  color: selectedCategory == 'food'
+                                      ? kPrimaryTextColor
+                                      : kDarkGrey,
                                 ),
                               ),
                             ),
@@ -200,20 +288,23 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       ],
                     ),
-
-
                     SizedBox(height: screenHeight * 0.02),
 
+                    // ---- 3) Future builder (grid) ----
                     FutureBuilder<List<SearchItem>>(
                       future: _futureItems,
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
                           return Padding(
                             padding: EdgeInsets.only(top: screenHeight * 0.1),
-                            child: const Center(child: CircularProgressIndicator()),
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
                           );
                         } else if (snapshot.hasError) {
-                          return Center(child: Text('Error: ${snapshot.error}'));
+                          return Center(
+                            child: Text('Error: ${snapshot.error}'),
+                          );
                         }
 
                         final allItems = snapshot.data ?? [];
@@ -222,9 +313,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         List<SearchItem> displayItems;
                         if (selectedCategory == 'resto') {
                           // We want distinct restaurants
-                          // Use a Set to track unique restaurant names
-                          Set<String> seenRestaurants = {};
-                          List<SearchItem> uniqueRestaurants = [];
+                          final seenRestaurants = <String>{};
+                          final uniqueRestaurants = <SearchItem>[];
                           for (var item in allItems) {
                             if (!seenRestaurants.contains(item.restaurantName)) {
                               seenRestaurants.add(item.restaurantName);
@@ -241,7 +331,10 @@ class _MyHomePageState extends State<MyHomePage> {
                           return const Center(child: Text('No items available.'));
                         }
 
-                        final gridItems = displayItems.length > 4 ? displayItems.sublist(0, 4) : displayItems;
+                        // Show max of 4 items for your grid
+                        final gridItems = displayItems.length > 4
+                            ? displayItems.sublist(0, 4)
+                            : displayItems;
 
                         return GridView.count(
                           crossAxisCount: 2,
@@ -250,22 +343,21 @@ class _MyHomePageState extends State<MyHomePage> {
                           crossAxisSpacing: 10,
                           mainAxisSpacing: 10,
                           children: gridItems.map((item) {
-                            // If we're displaying restaurants, we might want to show restaurant info primarily.
-                            // If food, show the food info.
-                            final title = (selectedCategory == 'resto') 
-                              ? item.restaurantName 
-                              : item.foodName;
-                            final subtitle = (selectedCategory == 'resto') 
-                              ? item.location 
-                              : item.description;
+                            final title = (selectedCategory == 'resto')
+                                ? item.restaurantName
+                                : item.foodName;
+                            final subtitle = (selectedCategory == 'resto')
+                                ? item.location
+                                : item.description;
 
-                            return Container(
+                            // The core container content
+                            final container = Container(
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: kWhite,
                                 borderRadius: BorderRadius.circular(8),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.grey.shade300,
+                                    color: Colors.black.withOpacity(0.1),
                                     blurRadius: 5,
                                     offset: const Offset(0, 3),
                                   ),
@@ -280,7 +372,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                     style: TextStyle(
                                       fontSize: screenWidth * 0.035,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.black87,
+                                      color: kPrimaryTextColor,
                                     ),
                                     textAlign: TextAlign.center,
                                   ),
@@ -289,13 +381,67 @@ class _MyHomePageState extends State<MyHomePage> {
                                     subtitle,
                                     style: TextStyle(
                                       fontSize: screenWidth * 0.025,
-                                      color: Colors.grey.shade600,
+                                      color: kDarkGrey,
                                     ),
                                     textAlign: TextAlign.center,
                                   ),
                                 ],
                               ),
                             );
+
+                            // If we're on 'resto', wrap in an InkWell to navigate to Restaurant
+                            if (selectedCategory == 'resto') {
+                              // Convert SearchItem -> Restaurant
+                              final restaurant = RestoModel.Restaurant(
+                              model: RestoModel.Model.MAIN_RESTAURANT,
+                              pk: item.restaurantId,
+                              fields: RestoModel.Fields(
+                                name: item.restaurantName,
+                                location: item.location,
+                              ),
+                            );
+
+                              return InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => RestaurantPageDetail(
+                                        restaurant,
+                                        true,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: container,
+                              );
+                            } else {
+                              // If 'food', wrap in an InkWell to navigate to Food
+                              final food = FoodModel.Food(
+                              model: FoodModel.Model.MAIN_FOOD,
+                              pk: item.foodId,
+                              fields: FoodModel.Fields(
+                                name: item.foodName,
+                                description: item.description,
+                                category: item.category,
+                                restaurant: item.restaurantId,
+                                price: item.price,
+                              ),
+                            );
+
+
+                              return InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => FoodPageDetail(food),
+                                    ),
+                                  );
+                                },
+                                child: container,
+                              );
+                            }
                           }).toList(),
                         );
                       },
@@ -310,38 +456,43 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  // ------------------- Search Bar -------------------
   Widget _buildSearchBar(BuildContext context, double screenWidth) {
     return GestureDetector(
       onTap: () {
         showSearch(
           context: context,
-          delegate: CustomSearch(),
+          delegate: CustomSearch(), // See below
         );
       },
       child: Container(
         width: double.infinity,
         height: screenWidth * 0.1,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: kWhite,
           borderRadius: BorderRadius.circular(15),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.shade300,
+              color: Colors.black.withOpacity(0.1),
               blurRadius: 5,
               offset: const Offset(0, 3),
             ),
           ],
         ),
+        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
         child: Row(
           children: [
-            SizedBox(width: screenWidth * 0.03),
-            Icon(Icons.search, color: Colors.grey.shade700, size: screenWidth * 0.04),
+            Icon(
+              Icons.search,
+              color: kDarkGrey,
+              size: screenWidth * 0.04,
+            ),
             SizedBox(width: screenWidth * 0.02),
             Text(
               'Nom..nom..nomm',
               style: TextStyle(
                 fontSize: screenWidth * 0.03,
-                color: Colors.grey.shade700,
+                color: kDarkGrey,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -352,14 +503,31 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
+class _UnifiedItem {
+  final bool isRestaurant;
+  final SearchItem data;
+  
+  _UnifiedItem({
+    required this.isRestaurant,
+    required this.data,
+  });
+}
+
+
+// ------------------------- Search Delegate -------------------------
 class CustomSearch extends SearchDelegate {
+  // 1) fetchSearchResults: calls your Django endpoint
   Future<List<SearchItem>> fetchSearchResults(String query) async {
     final url = Uri.parse('http://localhost:8000/search?query=$query');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
-      List data = jsonDecode(response.body);
-      return data.map((item) => SearchItem.fromJson(item)).toList().cast<SearchItem>();
+      final List data = jsonDecode(response.body);
+      // We assume each item in `data` is an object with { food_id, food_name, ... restaurant: {...} }
+      return data
+          .map((jsonObj) => SearchItem.fromJson(jsonObj))
+          .toList()
+          .cast<SearchItem>();
     } else {
       throw Exception('Failed to load search results');
     }
@@ -382,7 +550,7 @@ class CustomSearch extends SearchDelegate {
     return IconButton(
       icon: const Icon(Icons.arrow_back),
       onPressed: () {
-        close(context, null);
+        close(context, null); // Close the search overlay
       },
     );
   }
@@ -403,21 +571,99 @@ class CustomSearch extends SearchDelegate {
           return const Center(child: Text('No results found.'));
         }
 
+        // -------------------------------------------------------
+        // 1) Build a map of distinct restaurants by restaurantId
+        //    Key = restaurantId, Value = one representative SearchItem
+        // -------------------------------------------------------
+        final distinctRestaurantMap = <int, SearchItem>{};
+        for (final item in results) {
+          final rid = item.restaurantId;
+          if (!distinctRestaurantMap.containsKey(rid)) {
+            distinctRestaurantMap[rid] = item;
+          }
+        }
+
+        // Distinct restaurant items
+        final distinctRestaurants = distinctRestaurantMap.values.toList();
+
+        // -------------------------------------------------------
+        // 2) Build the final combined list
+        //    We want to show distinct restaurants + all foods
+        // -------------------------------------------------------
+        final combinedList = <_UnifiedItem>[];
+
+        // (a) Add each distinct restaurant as isRestaurant=true
+        for (final restoItem in distinctRestaurants) {
+          combinedList.add(
+            _UnifiedItem(isRestaurant: true, data: restoItem),
+          );
+        }
+
+        // (b) Add every item as isRestaurant=false (food)
+        for (final foodItem in results) {
+          combinedList.add(
+            _UnifiedItem(isRestaurant: false, data: foodItem),
+          );
+        }
+
+        // 3) Display them all in one ListView
         return ListView.builder(
-          itemCount: results.length,
+          itemCount: combinedList.length,
           itemBuilder: (context, index) {
-            final item = results[index];
-            // Here we show all results as they are just from search
+            final unified = combinedList[index];
+            final item = unified.data;
+
+            // Title depends on whether it's a restaurant or food
+            final title = unified.isRestaurant
+                ? item.restaurantName
+                : item.foodName;
+
+            // Subtitle too:
+            final subtitle = unified.isRestaurant
+                ? item.location
+                : item.description;
+
             return ListTile(
-              title: Text(item.foodName),
-              subtitle: Text(item.description),
-              trailing: Text(
-                item.category,
-                style: TextStyle(
-                  color: Colors.grey.shade600,
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
+              title: Text(title),
+              subtitle: Text(subtitle),
+              onTap: () {
+                if (unified.isRestaurant) {
+                  // Navigate to Restaurant
+                  final restaurant = RestoModel.Restaurant(
+                    model: RestoModel.Model.MAIN_RESTAURANT,
+                    pk: item.restaurantId,
+                    fields: RestoModel.Fields(
+                      name: item.restaurantName,
+                      location: item.location,
+                    ),
+                  );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => RestaurantPageDetail(restaurant, true),
+                    ),
+                  );
+                } else {
+                  // Navigate to Food
+                  final food = FoodModel.Food(
+                    model: FoodModel.Model.MAIN_FOOD,
+                    pk: item.foodId,
+                    fields: FoodModel.Fields(
+                      name: item.foodName,
+                      description: item.description,
+                      category: item.category, // not used for logic
+                      restaurant: item.restaurantId,
+                      price: item.price,
+                    ),
+                  );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => FoodPageDetail(food),
+                    ),
+                  );
+                }
+              },
             );
           },
         );
@@ -427,10 +673,12 @@ class CustomSearch extends SearchDelegate {
 
   @override
   Widget buildSuggestions(BuildContext context) {
+    // If query is empty, just show "Type something" placeholder
     if (query.isEmpty) {
       return const Center(child: Text('Type something to search.'));
     }
 
+    // Otherwise, do the same logic for partial suggestions
     return FutureBuilder<List<SearchItem>>(
       future: fetchSearchResults(query),
       builder: (context, snapshot) {
@@ -445,23 +693,82 @@ class CustomSearch extends SearchDelegate {
           return const Center(child: Text('No suggestions.'));
         }
 
+        // Same approach: distinct restaurants + all foods
+        final distinctRestaurantMap = <int, SearchItem>{};
+        for (final item in suggestions) {
+          final rid = item.restaurantId;
+          if (!distinctRestaurantMap.containsKey(rid)) {
+            distinctRestaurantMap[rid] = item;
+          }
+        }
+
+        final distinctRestaurants = distinctRestaurantMap.values.toList();
+
+        final combinedList = <_UnifiedItem>[];
+
+        // restaurants
+        for (final rItem in distinctRestaurants) {
+          combinedList.add(_UnifiedItem(isRestaurant: true, data: rItem));
+        }
+        // foods
+        for (final fItem in suggestions) {
+          combinedList.add(_UnifiedItem(isRestaurant: false, data: fItem));
+        }
+
         return ListView.builder(
-          itemCount: suggestions.length,
+          itemCount: combinedList.length,
           itemBuilder: (context, index) {
-            final item = suggestions[index];
+            final unified = combinedList[index];
+            final item = unified.data;
+
+            final title = unified.isRestaurant
+                ? item.restaurantName
+                : item.foodName;
+
+            final subtitle = unified.isRestaurant
+                ? item.location
+                : item.description;
+
             return ListTile(
-              title: Text(item.foodName),
-              subtitle: Text(item.description),
-              trailing: Text(
-                item.category,
-                style: TextStyle(
-                  color: Colors.grey.shade600,
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
+              title: Text(title),
+              subtitle: Text(subtitle),
               onTap: () {
-                query = item.foodName;
-                showResults(context);
+                query = title; // fill the search bar
+
+                if (unified.isRestaurant) {
+                  final restaurant = RestoModel.Restaurant(
+                    model: RestoModel.Model.MAIN_RESTAURANT,
+                    pk: item.restaurantId,
+                    fields: RestoModel.Fields(
+                      name: item.restaurantName,
+                      location: item.location,
+                    ),
+                  );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => RestaurantPageDetail(restaurant, true),
+                    ),
+                  );
+                } else {
+                  final food = FoodModel.Food(
+                    model: FoodModel.Model.MAIN_FOOD,
+                    pk: item.foodId,
+                    fields: FoodModel.Fields(
+                      name: item.foodName,
+                      description: item.description,
+                      category: item.category,
+                      restaurant: item.restaurantId,
+                      price: item.price,
+                    ),
+                  );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => FoodPageDetail(food),
+                    ),
+                  );
+                }
               },
             );
           },
@@ -470,4 +777,3 @@ class CustomSearch extends SearchDelegate {
     );
   }
 }
-
