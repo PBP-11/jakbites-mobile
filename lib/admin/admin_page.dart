@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:jakbites_mobile/admin/food_form.dart';
 import 'package:jakbites_mobile/admin/restaurant_form.dart';
+import 'package:jakbites_mobile/authentication/login.dart';
 import 'package:jakbites_mobile/food/models/food_model.dart';
 import 'package:jakbites_mobile/models/resutarant_model.dart';
 import 'package:jakbites_mobile/widgets/left_drawer.dart';
@@ -152,6 +153,20 @@ class _AdminPageState extends State<AdminPage> {
     // Optionally add checks to ensure only admins can view
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            final request = context.read<CookieRequest>();
+            request.logout(
+              "http://localhost:8000/authentication/logout_flutter/",
+            ).then((response) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginPage()),
+              );
+            });
+          },
+        ),
         title: const Text('Admin Page'),
         backgroundColor: Colors.grey[50], // Match login page app bar
         foregroundColor: Colors.black,
