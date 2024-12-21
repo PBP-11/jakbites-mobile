@@ -86,7 +86,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           const EdgeInsets.symmetric(horizontal: 12.0, vertical: 5.0),
                       labelStyle: Theme.of(context).textTheme.bodySmall,
                     ),
-                    obscureText: true,
+                    obscureText: false,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter your email';
@@ -154,7 +154,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       String password2 = _confirmPasswordController.text;
 
                       final response = await request.postJson(
-                          "http://localhost:8000/authentication/register_flutter",
+                          "http://localhost:8000/authentication/register_flutter/",
                           jsonEncode({
                             "username": username,
                             "email" : email,
@@ -165,7 +165,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         if (response['status'] == 'success') {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Successfully registered!'),
+                              content: Text('Successfully registered! Please log in.'),
                             ),
                           );
                           Navigator.pushReplacement(
@@ -175,8 +175,8 @@ class _RegisterPageState extends State<RegisterPage> {
                           );
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Failed to register!'),
+                            SnackBar(
+                              content: Text(response['message'] ?? 'Failed to register!'),
                             ),
                           );
                         }
