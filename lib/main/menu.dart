@@ -5,9 +5,12 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 // Import your Restaurant model & detail page:
-import 'package:jakbites_mobile/models/resutarant_model.dart'; 
+import 'package:jakbites_mobile/models/resutarant_model.dart' as RestoModel;
 import 'package:jakbites_mobile/restaurant/restaurant_detail.dart';
-// ^^^ Adjust the import paths as needed ^^^
+
+// Import your Food model & detail page:
+import 'package:jakbites_mobile/food/models/food_model.dart' as FoodModel;
+import 'package:jakbites_mobile/food/screens/food_detail.dart';
 
 // Example of a simplified color palette for consistency
 const Color kBackgroundColor = Color(0xFFD1D5DB); // Main background
@@ -386,17 +389,17 @@ class _MyHomePageState extends State<MyHomePage> {
                               ),
                             );
 
-                            // If we're on 'resto', wrap in an InkWell to navigate
+                            // If we're on 'resto', wrap in an InkWell to navigate to Restaurant
                             if (selectedCategory == 'resto') {
                               // Convert SearchItem -> Restaurant
-                              final restaurant = Restaurant(
-                                model: Model.MAIN_RESTAURANT,
-                                pk: item.restaurantId,
-                                fields: Fields(
-                                  name: item.restaurantName,
-                                  location: item.location,
-                                ),
-                              );
+                              final restaurant = RestoModel.Restaurant(
+                              model: RestoModel.Model.MAIN_RESTAURANT,
+                              pk: item.restaurantId,
+                              fields: RestoModel.Fields(
+                                name: item.restaurantName,
+                                location: item.location,
+                              ),
+                            );
 
                               return InkWell(
                                 onTap: () {
@@ -413,8 +416,31 @@ class _MyHomePageState extends State<MyHomePage> {
                                 child: container,
                               );
                             } else {
-                              // If 'food', just return the container w/o navigation
-                              return container;
+                              // If 'food', wrap in an InkWell to navigate to Food
+                              final food = FoodModel.Food(
+                              model: FoodModel.Model.MAIN_FOOD,
+                              pk: item.foodId,
+                              fields: FoodModel.Fields(
+                                name: item.foodName,
+                                description: item.description,
+                                category: item.category,
+                                restaurant: item.restaurantId,
+                                price: item.price,
+                              ),
+                            );
+
+
+                              return InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => FoodPageDetail(food),
+                                    ),
+                                  );
+                                },
+                                child: container,
+                              );
                             }
                           }).toList(),
                         );
@@ -436,7 +462,7 @@ class _MyHomePageState extends State<MyHomePage> {
       onTap: () {
         showSearch(
           context: context,
-          delegate: CustomSearch(),
+          delegate: CustomSearch(), // See below
         );
       },
       child: Container(
@@ -477,16 +503,29 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
+class _UnifiedItem {
+  final bool isRestaurant;
+  final SearchItem data;
+  
+  _UnifiedItem({
+    required this.isRestaurant,
+    required this.data,
+  });
+}
+
+
 // ------------------------- Search Delegate -------------------------
 class CustomSearch extends SearchDelegate {
+  // 1) fetchSearchResults: calls your Django endpoint
   Future<List<SearchItem>> fetchSearchResults(String query) async {
     final url = Uri.parse('http://localhost:8000/search?query=$query');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
-      List data = jsonDecode(response.body);
+      final List data = jsonDecode(response.body);
+      // We assume each item in `data` is an object with { food_id, food_name, ... restaurant: {...} }
       return data
-          .map((item) => SearchItem.fromJson(item))
+          .map((jsonObj) => SearchItem.fromJson(jsonObj))
           .toList()
           .cast<SearchItem>();
     } else {
@@ -511,7 +550,7 @@ class CustomSearch extends SearchDelegate {
     return IconButton(
       icon: const Icon(Icons.arrow_back),
       onPressed: () {
-        close(context, null);
+        close(context, null); // Close the search overlay
       },
     );
   }
@@ -532,20 +571,99 @@ class CustomSearch extends SearchDelegate {
           return const Center(child: Text('No results found.'));
         }
 
+        // -------------------------------------------------------
+        // 1) Build a map of distinct restaurants by restaurantId
+        //    Key = restaurantId, Value = one representative SearchItem
+        // -------------------------------------------------------
+        final distinctRestaurantMap = <int, SearchItem>{};
+        for (final item in results) {
+          final rid = item.restaurantId;
+          if (!distinctRestaurantMap.containsKey(rid)) {
+            distinctRestaurantMap[rid] = item;
+          }
+        }
+
+        // Distinct restaurant items
+        final distinctRestaurants = distinctRestaurantMap.values.toList();
+
+        // -------------------------------------------------------
+        // 2) Build the final combined list
+        //    We want to show distinct restaurants + all foods
+        // -------------------------------------------------------
+        final combinedList = <_UnifiedItem>[];
+
+        // (a) Add each distinct restaurant as isRestaurant=true
+        for (final restoItem in distinctRestaurants) {
+          combinedList.add(
+            _UnifiedItem(isRestaurant: true, data: restoItem),
+          );
+        }
+
+        // (b) Add every item as isRestaurant=false (food)
+        for (final foodItem in results) {
+          combinedList.add(
+            _UnifiedItem(isRestaurant: false, data: foodItem),
+          );
+        }
+
+        // 3) Display them all in one ListView
         return ListView.builder(
-          itemCount: results.length,
+          itemCount: combinedList.length,
           itemBuilder: (context, index) {
-            final item = results[index];
+            final unified = combinedList[index];
+            final item = unified.data;
+
+            // Title depends on whether it's a restaurant or food
+            final title = unified.isRestaurant
+                ? item.restaurantName
+                : item.foodName;
+
+            // Subtitle too:
+            final subtitle = unified.isRestaurant
+                ? item.location
+                : item.description;
+
             return ListTile(
-              title: Text(item.foodName),
-              subtitle: Text(item.description),
-              trailing: Text(
-                item.category,
-                style: TextStyle(
-                  color: kDarkGrey,
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
+              title: Text(title),
+              subtitle: Text(subtitle),
+              onTap: () {
+                if (unified.isRestaurant) {
+                  // Navigate to Restaurant
+                  final restaurant = RestoModel.Restaurant(
+                    model: RestoModel.Model.MAIN_RESTAURANT,
+                    pk: item.restaurantId,
+                    fields: RestoModel.Fields(
+                      name: item.restaurantName,
+                      location: item.location,
+                    ),
+                  );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => RestaurantPageDetail(restaurant, true),
+                    ),
+                  );
+                } else {
+                  // Navigate to Food
+                  final food = FoodModel.Food(
+                    model: FoodModel.Model.MAIN_FOOD,
+                    pk: item.foodId,
+                    fields: FoodModel.Fields(
+                      name: item.foodName,
+                      description: item.description,
+                      category: item.category, // not used for logic
+                      restaurant: item.restaurantId,
+                      price: item.price,
+                    ),
+                  );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => FoodPageDetail(food),
+                    ),
+                  );
+                }
+              },
             );
           },
         );
@@ -555,10 +673,12 @@ class CustomSearch extends SearchDelegate {
 
   @override
   Widget buildSuggestions(BuildContext context) {
+    // If query is empty, just show "Type something" placeholder
     if (query.isEmpty) {
       return const Center(child: Text('Type something to search.'));
     }
 
+    // Otherwise, do the same logic for partial suggestions
     return FutureBuilder<List<SearchItem>>(
       future: fetchSearchResults(query),
       builder: (context, snapshot) {
@@ -573,23 +693,82 @@ class CustomSearch extends SearchDelegate {
           return const Center(child: Text('No suggestions.'));
         }
 
+        // Same approach: distinct restaurants + all foods
+        final distinctRestaurantMap = <int, SearchItem>{};
+        for (final item in suggestions) {
+          final rid = item.restaurantId;
+          if (!distinctRestaurantMap.containsKey(rid)) {
+            distinctRestaurantMap[rid] = item;
+          }
+        }
+
+        final distinctRestaurants = distinctRestaurantMap.values.toList();
+
+        final combinedList = <_UnifiedItem>[];
+
+        // restaurants
+        for (final rItem in distinctRestaurants) {
+          combinedList.add(_UnifiedItem(isRestaurant: true, data: rItem));
+        }
+        // foods
+        for (final fItem in suggestions) {
+          combinedList.add(_UnifiedItem(isRestaurant: false, data: fItem));
+        }
+
         return ListView.builder(
-          itemCount: suggestions.length,
+          itemCount: combinedList.length,
           itemBuilder: (context, index) {
-            final item = suggestions[index];
+            final unified = combinedList[index];
+            final item = unified.data;
+
+            final title = unified.isRestaurant
+                ? item.restaurantName
+                : item.foodName;
+
+            final subtitle = unified.isRestaurant
+                ? item.location
+                : item.description;
+
             return ListTile(
-              title: Text(item.foodName),
-              subtitle: Text(item.description),
-              trailing: Text(
-                item.category,
-                style: TextStyle(
-                  color: kDarkGrey,
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
+              title: Text(title),
+              subtitle: Text(subtitle),
               onTap: () {
-                query = item.foodName;
-                showResults(context);
+                query = title; // fill the search bar
+
+                if (unified.isRestaurant) {
+                  final restaurant = RestoModel.Restaurant(
+                    model: RestoModel.Model.MAIN_RESTAURANT,
+                    pk: item.restaurantId,
+                    fields: RestoModel.Fields(
+                      name: item.restaurantName,
+                      location: item.location,
+                    ),
+                  );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => RestaurantPageDetail(restaurant, true),
+                    ),
+                  );
+                } else {
+                  final food = FoodModel.Food(
+                    model: FoodModel.Model.MAIN_FOOD,
+                    pk: item.foodId,
+                    fields: FoodModel.Fields(
+                      name: item.foodName,
+                      description: item.description,
+                      category: item.category,
+                      restaurant: item.restaurantId,
+                      price: item.price,
+                    ),
+                  );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => FoodPageDetail(food),
+                    ),
+                  );
+                }
               },
             );
           },
