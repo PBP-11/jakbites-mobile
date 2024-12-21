@@ -111,9 +111,14 @@ class _LoginPageState extends State<LoginPage> {
                       });
 
                       if (request.loggedIn) {
+                        // print("AMAN I");
                         String message = response['message'];
+                        // print(message);
                         String uname = response['username'];
+                        // print(uname);
                         String userType = response['user_type']; // Get user type
+                        // print(userType);
+                        // print(message + uname + userType);
                         if (context.mounted) {
                           if (userType == 'admin') {
                             Navigator.pushReplacement(
