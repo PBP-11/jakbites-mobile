@@ -101,17 +101,6 @@ class LeftDrawer extends StatelessWidget {
                 ),
                 _buildDrawerItem(
                   context,
-                  icon: Icons.admin_panel_settings,
-                  title: 'Admin Page',
-                  onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const AdminPage()),
-                  );
-                  },
-                ),
-                _buildDrawerItem(
-                  context,
                   icon: Icons.account_circle,
                   title: 'Profile',
                   onTap: () {

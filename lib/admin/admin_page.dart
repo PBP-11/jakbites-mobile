@@ -24,6 +24,7 @@ class _AdminPageState extends State<AdminPage> {
   @override
   void initState() {
     super.initState();
+    // Optionally verify admin access
     fetchItems();
   }
 
@@ -148,6 +149,7 @@ class _AdminPageState extends State<AdminPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Optionally add checks to ensure only admins can view
     return Scaffold(
       appBar: AppBar(
         title: const Text('Admin Page'),

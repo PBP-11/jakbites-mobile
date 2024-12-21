@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jakbites_mobile/admin/admin_page.dart';
 import 'package:jakbites_mobile/authentication/register.dart';
 import 'package:jakbites_mobile/main/menu.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
@@ -112,12 +113,19 @@ class _LoginPageState extends State<LoginPage> {
                       if (request.loggedIn) {
                         String message = response['message'];
                         String uname = response['username'];
+                        String userType = response['user_type']; // Get user type
                         if (context.mounted) {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const MyHomePage()),
-                          );
+                          if (userType == 'admin') {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => const AdminPage()),
+                            );
+                          } else {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => const MyHomePage()),
+                            );
+                          }
                           ScaffoldMessenger.of(context)
                             ..hideCurrentSnackBar()
                             ..showSnackBar(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jakbites_mobile/admin/admin_page.dart';
 import 'package:jakbites_mobile/authentication/login.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
@@ -43,7 +44,34 @@ class MyApp extends StatelessWidget {
             color: Colors.transparent,
           ),
         ),
-        home: const LoginPage()
+        home: Consumer<CookieRequest>(
+          builder: (context, request, child) {
+            if (request.loggedIn) {
+              // Fetch user type from the backend
+              return FutureBuilder(
+                future: request.get('http://localhost:8000/authentication/get_user_type_flutter/'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Scaffold(
+                      body: Center(child: CircularProgressIndicator()),
+                    );
+                  } else if (snapshot.hasError || !snapshot.hasData) {
+                    return const LoginPage();
+                  } else {
+                    final userType = snapshot.data['user_type'];
+                    if (userType == 'admin') {
+                      return const AdminPage();
+                    } else {
+                      return const MyHomePage();
+                    }
+                  }
+                },
+              );
+            } else {
+              return const LoginPage();
+            }
+          },
+        ),
       ),
     );
   }
