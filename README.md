@@ -5,7 +5,8 @@
 ### Build Badge  
 [![Build status](https://build.appcenter.ms/v0.1/apps/f42e3dea-3a3a-4576-bfbe-706ad8177e6c/branches/main/badge)](https://appcenter.ms)
 
-### [🚀 Tautan Deploy Aplikasi (Akan Diberikan)](link_here)
+
+### [🚀 Download Here!](https://install.appcenter.ms/orgs/pbp-11/apps/jakbites/distribution_groups/public/releases/7)
 
 ## Tim Kami 👥
 
