@@ -120,9 +120,10 @@ class LeftDrawer extends StatelessWidget {
             icon: Icons.logout,
             title: 'Logout/Login',
             onTap: () {
-              Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const LoginPage()),
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginPage()),
+                (route) => false,
               );
             },
           ),
