@@ -98,7 +98,7 @@ class Food {
 
 // Fetching profile data using API
 // Future<Profile?> fetchProfileData() async {
-//   final response = await http.get(Uri.parse('http://localhost:8000/user/get_client_data/'));
+//   final response = await http.get(Uri.parse('https://william-matthew31-jakbites.pbp.cs.ui.ac.id/user/get_client_data/'));
 
 //   if (response.statusCode == 200) {
 //     return Profile.fromJson(json.decode(response.body)['data']);
@@ -110,7 +110,7 @@ class Food {
 // // Update username
 // Future<bool> updateUsername(String newName) async {
 //   final response = await http.post(
-//     Uri.parse('http://localhost:8000/user/profile/change-name/'),
+//     Uri.parse('https://william-matthew31-jakbites.pbp.cs.ui.ac.id/user/profile/change-name/'),
 //     headers: {'Content-Type': 'application/json'},
 //     body: json.encode({'new_value': newName}),
 //   );
@@ -121,7 +121,7 @@ class Food {
 // // Update description
 // Future<bool> updateDescription(String newDescription) async {
 //   final response = await http.post(
-//     Uri.parse('http://localhost:8000/user/profile/change-description/'),
+//     Uri.parse('https://william-matthew31-jakbites.pbp.cs.ui.ac.id/user/profile/change-description/'),
 //     headers: {'Content-Type': 'application/json'},
 //     body: json.encode({'new_value': newDescription}),
 //   );

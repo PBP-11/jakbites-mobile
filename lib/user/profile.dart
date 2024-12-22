@@ -14,7 +14,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 
-const String baseUrl = 'http://localhost:8000'; // Adjust based on your environment
+const String baseUrl = 'https://william-matthew31-jakbites.pbp.cs.ui.ac.id'; // Adjust based on your environment
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);

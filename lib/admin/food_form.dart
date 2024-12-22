@@ -39,7 +39,7 @@ class _FoodFormPageState extends State<FoodFormPage> {
 
   Future<void> fetchRestaurants() async {
     final request = context.read<CookieRequest>();
-    final response = await request.get('http://localhost:8000/json_restaurant/');
+    final response = await request.get('https://william-matthew31-jakbites.pbp.cs.ui.ac.id/json_restaurant/');
     if (!mounted) return;
     
     // The response is already decoded by the CookieRequest class
@@ -221,7 +221,7 @@ class _FoodFormPageState extends State<FoodFormPage> {
                           if (isEdit) {
                             // Edit existing food
                             final response = await request.postJson(
-                              "http://localhost:8000/authentication/edit_food_flutter/",
+                              "https://william-matthew31-jakbites.pbp.cs.ui.ac.id/authentication/edit_food_flutter/",
                               jsonEncode({
                                 "id": widget.food!.pk,
                                 "name": _name,
@@ -251,7 +251,7 @@ class _FoodFormPageState extends State<FoodFormPage> {
                           } else {
                             // Add new food
                             final response = await request.postJson(
-                              "http://localhost:8000/authentication/create_food_flutter/",
+                              "https://william-matthew31-jakbites.pbp.cs.ui.ac.id/authentication/create_food_flutter/",
                               jsonEncode({
                                 "name": _name,
                                 "description": _description,

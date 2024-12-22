@@ -27,7 +27,7 @@ class _RestaurantPageDetailState extends State<RestaurantPageDetail> {
   Future deleteReview(int id) async {
     // print(id);
   final http.Response response = await http.delete(
-    Uri.parse('http://localhost:8000/restaurant/drf/'),
+    Uri.parse('https://william-matthew31-jakbites.pbp.cs.ui.ac.id/restaurant/drf/'),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -40,7 +40,7 @@ class _RestaurantPageDetailState extends State<RestaurantPageDetail> {
 
   double avg_rating = 0.0;
   Future<List<ReviewRestaurant>> fetchReviewRestaurant(CookieRequest request) async {
-    final response =await request.get('http://localhost:8000/json_review_restaurant/');
+    final response =await request.get('https://william-matthew31-jakbites.pbp.cs.ui.ac.id/json_review_restaurant/');
 
     // Melakukan decode response menjadi bentuk json
     var data = response;
@@ -65,7 +65,7 @@ class _RestaurantPageDetailState extends State<RestaurantPageDetail> {
 
   Future<List<Food>> fetchFood(CookieRequest request) async {
     final response =
-        await request.get('http://localhost:8000/json_food/');
+        await request.get('https://william-matthew31-jakbites.pbp.cs.ui.ac.id/json_food/');
 
     // Melakukan decode response menjadi bentuk json
     var data = response;

@@ -33,14 +33,14 @@ class _AdminPageState extends State<AdminPage> {
     final request = context.read<CookieRequest>();
     if (_currentIndex == 0) {
       // Fetch Restaurants
-      final response = await request.get('http://localhost:8000/json_restaurant/');
+      final response = await request.get('https://william-matthew31-jakbites.pbp.cs.ui.ac.id/json_restaurant/');
       if (!mounted) return;
       setState(() {
         restaurants = restaurantFromJson(jsonEncode(response));
       });
     } else {
       // Fetch Foods
-      final response = await request.get('http://localhost:8000/json_food/');
+      final response = await request.get('https://william-matthew31-jakbites.pbp.cs.ui.ac.id/json_food/');
       if (!mounted) return;
       setState(() {
         foods = foodFromJson(jsonEncode(response));
@@ -99,7 +99,7 @@ class _AdminPageState extends State<AdminPage> {
     if (_currentIndex == 0) {
       // Delete Restaurant
       final response = await request.postJson(
-        'http://localhost:8000/authentication/delete_restaurant_flutter/',
+        'https://william-matthew31-jakbites.pbp.cs.ui.ac.id/authentication/delete_restaurant_flutter/',
         jsonEncode({"id": id}),
       );
       if (response['status'] == 'success') {
@@ -123,7 +123,7 @@ class _AdminPageState extends State<AdminPage> {
     } else {
       // Delete Food
       final response = await request.postJson(
-        'http://localhost:8000/authentication/delete_food_flutter/',
+        'https://william-matthew31-jakbites.pbp.cs.ui.ac.id/authentication/delete_food_flutter/',
         jsonEncode({"id": id}),
       );
 
@@ -158,7 +158,7 @@ class _AdminPageState extends State<AdminPage> {
           onPressed: () {
             final request = context.read<CookieRequest>();
             request.logout(
-              "http://localhost:8000/authentication/logout_flutter/",
+              "https://william-matthew31-jakbites.pbp.cs.ui.ac.id/authentication/logout_flutter/",
             ).then((response) {
               Navigator.pushReplacement(
                 context,

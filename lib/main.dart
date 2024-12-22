@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
             if (request.loggedIn) {
               // Fetch user type from the backend
               return FutureBuilder(
-                future: request.get('http://localhost:8000/authentication/get_user_type_flutter/'),
+                future: request.get('https://william-matthew31-jakbites.pbp.cs.ui.ac.id/authentication/get_user_type_flutter/'),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Scaffold(

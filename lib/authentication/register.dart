@@ -154,7 +154,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       String password2 = _confirmPasswordController.text;
 
                       final response = await request.postJson(
-                          "http://localhost:8000/authentication/register_flutter/",
+                          "https://william-matthew31-jakbites.pbp.cs.ui.ac.id/authentication/register_flutter/",
                           jsonEncode({
                             "username": username,
                             "email" : email,

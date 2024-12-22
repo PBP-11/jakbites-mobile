@@ -70,7 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   /// This calls /search_flut?query= but with an empty query => gets all items
   Future<Map<String, dynamic>> fetchMenuData() async {
-    final url = Uri.parse('http://localhost:8000/search_flut?query=');
+    final url = Uri.parse('https://william-matthew31-jakbites.pbp.cs.ui.ac.id/search_flut?query=');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -87,7 +87,7 @@ class _MyHomePageState extends State<MyHomePage> {
       throw Exception("User not logged in");
     }
 
-    const baseUrl = 'http://localhost:8000';
+    const baseUrl = 'https://william-matthew31-jakbites.pbp.cs.ui.ac.id';
     final response = await request.get('$baseUrl/user/get_client_data/');
     if (response['success']) {
       return Profile.fromJson(response['data']);
@@ -701,7 +701,7 @@ class _MyHomePageState extends State<MyHomePage> {
 /// The custom search delegate
 class CustomSearch extends SearchDelegate {
   Future<Map<String, dynamic>> fetchSearchData(String query) async {
-    final url = Uri.parse('http://localhost:8000/search_flut?query=$query');
+    final url = Uri.parse('https://william-matthew31-jakbites.pbp.cs.ui.ac.id/search_flut?query=$query');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {

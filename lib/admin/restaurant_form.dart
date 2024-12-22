@@ -117,7 +117,7 @@ class _RestaurantFormPageState extends State<RestaurantFormPage> {
                           if (isEdit) {
                             // Edit existing restaurant
                             final response = await request.postJson(
-                              "http://localhost:8000/authentication/edit_restaurant_flutter/",
+                              "https://william-matthew31-jakbites.pbp.cs.ui.ac.id/authentication/edit_restaurant_flutter/",
                               jsonEncode({
                                 "id": widget.restaurant!.pk,
                                 "name": _name,
@@ -145,7 +145,7 @@ class _RestaurantFormPageState extends State<RestaurantFormPage> {
                           } else {
                             // Add new restaurant
                             final response = await request.postJson(
-                              "http://localhost:8000/authentication/create_restaurant_flutter/",
+                              "https://william-matthew31-jakbites.pbp.cs.ui.ac.id/authentication/create_restaurant_flutter/",
                               jsonEncode({
                                 "name": _name,
                                 "location": _location,

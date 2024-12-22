@@ -129,7 +129,7 @@ class _RestaurantReviewState extends State<RestaurantReview> {
                           var response;
                           if (widget.reviewID >= 0) {
                             response = await http.put(
-                              Uri.parse('http://localhost:8000/restaurant/urf/'),
+                              Uri.parse('https://william-matthew31-jakbites.pbp.cs.ui.ac.id/restaurant/urf/'),
                               headers: <String, String>{
                                 'Content-Type': 'application/json; charset=UTF-8',
                               },
@@ -142,7 +142,7 @@ class _RestaurantReviewState extends State<RestaurantReview> {
                             );
                           } else {
                             response = await request.postJson(
-                              "http://localhost:8000/restaurant/crf/",
+                              "https://william-matthew31-jakbites.pbp.cs.ui.ac.id/restaurant/crf/",
                               jsonEncode(<String, dynamic>{
                                 'restaurant': widget.resto.pk,
                                 'review': _reviewRestaurant,
