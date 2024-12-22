@@ -2,11 +2,9 @@
 
 ### 🍽️ Temukan restoran dan makanan terbaik di Jakarta! 🌆  
 
-### Build Badge  
+### [🚀 Tautan APK](https://install.appcenter.ms/orgs/pbp-11/apps/jakbites/distribution_groups/public/releases/7)
+
 [![Build status](https://build.appcenter.ms/v0.1/apps/f42e3dea-3a3a-4576-bfbe-706ad8177e6c/branches/main/badge)](https://appcenter.ms)
-
-
-### [🚀 Download Here!](https://install.appcenter.ms/orgs/pbp-11/apps/jakbites/distribution_groups/public/releases/7)
 
 ## Tim Kami 👥
 
@@ -98,5 +96,5 @@ Untuk mengintegrasikan aplikasi mobile JakBites dengan layanan web yang telah di
 Dengan mengikuti langkah-langkah di atas, aplikasi mobile JakBites berhasil terhubung dengan layanan web, memungkinkan sinkronisasi data antara aplikasi web dan mobile serta memberikan pengalaman pengguna yang konsisten.
 
 ## Tracker Progress 🧑‍💻
-https://docs.google.com/spreadsheets/d/1knfOWS6yBqFtnk24bmdTAVb6XyoES_G3vpkKikH71y8/edit?usp=sharing
+- [jakbites_mobile Progress Tracker](https://docs.google.com/spreadsheets/d/1knfOWS6yBqFtnk24bmdTAVb6XyoES_G3vpkKikH71y8/edit?usp=sharing)
 
