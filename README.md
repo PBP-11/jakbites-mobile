@@ -1,6 +1,9 @@
 # JakBites oleh F11 - PBP 2024/2025
 
-### 🍽️ Temukan restoran dan makanan terbaik di Jakarta! 🌆
+### 🍽️ Temukan restoran dan makanan terbaik di Jakarta! 🌆  
+
+### Build Badge  
+[![Build status](https://build.appcenter.ms/v0.1/apps/f42e3dea-3a3a-4576-bfbe-706ad8177e6c/branches/main/badge)](https://appcenter.ms)
 
 ### [🚀 Tautan Deploy Aplikasi (Akan Diberikan)](link_here)
 
@@ -96,5 +99,3 @@ Dengan mengikuti langkah-langkah di atas, aplikasi mobile JakBites berhasil terh
 ## Tracker Progress 🧑‍💻
 https://docs.google.com/spreadsheets/d/1knfOWS6yBqFtnk24bmdTAVb6XyoES_G3vpkKikH71y8/edit?usp=sharing
 
-## Build Badge  
-[![Build status](https://build.appcenter.ms/v0.1/apps/f42e3dea-3a3a-4576-bfbe-706ad8177e6c/branches/main/badge)](https://appcenter.ms)
